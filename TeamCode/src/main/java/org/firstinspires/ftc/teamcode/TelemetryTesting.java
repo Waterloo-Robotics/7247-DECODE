@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 // -------------------------------------------------------------------------------
 @TeleOp
-public class telemtest extends OpMode {
+public class TelemetryTesting extends OpMode {
 private Limelight3A limelight;
     private IMU imu;
 
@@ -25,11 +26,21 @@ private Limelight3A limelight;
     //grabs from TestIMU.java
     TestIMU bench = new TestIMU();
 
-    // ---
+    // --- motors
+
+
+
+
+
     // marks patterns as false at the start
 
     // ---
     private String detectedPattern = "None";
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+
 
     // --------------------------------------------------
 
@@ -52,6 +63,12 @@ private Limelight3A limelight;
         tag_found_23 = false;
         tagID = false;
 
+        // motors ---
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+
 
     }
 
@@ -66,6 +83,16 @@ private Limelight3A limelight;
 
     @Override
     public void loop() {
+        // ------
+
+
+
+
+
+        //-----------------------------------
+
+
+
         // IMU
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
@@ -87,22 +114,23 @@ private Limelight3A limelight;
         if (tag_found_21)
         {
             detectedPattern = "GREEN PURPLE PURPLE";
-            tagID = "21";
+
         }
         else if (tag_found_22)
         {
             detectedPattern = "PURPLE GREEN PURPLE";
-            tagID = "22";
+
         }
         else if (tag_found_23){
             detectedPattern = "PURPLE PURPLE GREEN";
-            tagID = "23";
+
         } }
 
         telemetry.addData("Pattern", detectedPattern);
-        telemetry.addData("April Tag", tagID)
         telemetry.update();
         // end of motif stuff
+
     }
 
 }
+// Starting Odometry here

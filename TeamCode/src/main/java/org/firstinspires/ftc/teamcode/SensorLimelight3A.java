@@ -1,22 +1,45 @@
 /*
+Copyright (c) 2024 Limelight Vision
 
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted (subject to the limitations in the disclaimer below) provided that
+the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+Neither the name of FIRST nor the names of its contributors may be used to
+endorse or promote products derived from this software without specific prior
+written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.robotcontroller.external.samples;
-
-// test teleop that moves servos based on true april tag
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.Rev9AxisImuOrientationOnRobot;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
@@ -44,45 +67,41 @@ import java.util.List;
  *   below the name of the Limelight on the top level configuration screen.
  */
 @TeleOp(name = "Sensor: Limelight3A", group = "Sensor")
+@Disabled
 public class SensorLimelight3A extends LinearOpMode {
 
     private Limelight3A limelight;
-    private Servo servo;
-    private boolean tag_found_21;
-    private boolean tag_found_22;
-    private boolean tag_found_23;
 
 
-// LIMELIGHT DATA
+
+
+
     @Override
     public void runOpMode() throws InterruptedException
     {
-
-
-        // grabbing hardware
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        servo = hardwareMap.get(Servo.class, "servo");
 
         telemetry.setMsTransmissionInterval(11);
 
         limelight.pipelineSwitch(0);
 
+        /*
+         * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
+         */
         limelight.start();
-// telemetry data
+
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
         waitForStart();
 
-        // START OF LIMELIGHT
         while (opModeIsActive()) {
             LLStatus status = limelight.getStatus();
             telemetry.addData("Name", "%s",
                     status.getName());
-
-            // needed
-            tag_found_21 = false;
-            tag_found_22= false;
-            tag_found_23 = false;
+            telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
+                    status.getTemp(), status.getCpu(),(int)status.getFps());
+            telemetry.addData("Pipeline", "Index: %d, Type: %s",
+                    status.getPipelineIndex(), status.getPipelineType());
 
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
@@ -91,6 +110,16 @@ public class SensorLimelight3A extends LinearOpMode {
                 double captureLatency = result.getCaptureLatency();
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
+                telemetry.addData("LL Latency", captureLatency + targetingLatency);
+                telemetry.addData("Parse Latency", parseLatency);
+                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("txnc", result.getTxNC());
+                telemetry.addData("ty", result.getTy());
+                telemetry.addData("tync", result.getTyNC());
+
+                telemetry.addData("Botpose", botpose.toString());
 
                 // Access barcode results
                 List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
@@ -110,18 +139,10 @@ public class SensorLimelight3A extends LinearOpMode {
                     telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
                 }
 
-                // Access fiducial results - shows tag ID and weird distance on ds
+                // Access fiducial results
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                    telemetry.addData("Fiducial", "April Tag ID: %d, Family: %s, Distance: %.2f, Height: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-                    if (fr.getFiducialId() == 21)
-                    {
-                        tag_found_21 = true;
-                    }
-                    if (fr.getFiducialId() == 22)
-                    {
-                        tag_found_22 = true;
-                    }
+                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
                 }
 
                 // Access color results
@@ -133,31 +154,8 @@ public class SensorLimelight3A extends LinearOpMode {
                 telemetry.addData("Limelight", "No data available");
             }
 
-            // makes servos move based on read tag
-            if (tag_found_21)
-            {
-                servo.setPosition(1);
-                telemetry.addData("Will you", "Come to homecoming?");
-
-            }
-            else if (tag_found_22)
-            {
-                servo.setPosition(0.5);
-            }
-            else if (tag_found_23){
-                servo.setPosition(2);
-            }
-            else {
-                servo.setPosition(0);
-            }
-
-
             telemetry.update();
         }
         limelight.stop();
-
-        servo.getPosition();
-        telemetry.addData("Servo Position", servo.getPosition());
-        telemetry.update();
     }
 }
