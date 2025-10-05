@@ -58,16 +58,24 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 @TeleOp(name="H2O Loo Bots Teleop", group="")
 public class TeleOp_H2OLooBots extends OpMode{
-
     private Limelight3A limelight;
-    private IMU imu;
     private DcMotor backLeft, backRight, frontLeft, frontRight;
     private DcMotor motor;  // Turret motor
 
+    // lm stuff
+    private static final double Kp = 0.02;
+    private static final double Ki = 0.0;
+    private static final double Kd = 0.06;
 
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    private double integral = 0;
+    private double lastError = 0;
+
+    private static final double MIN_POWER = 0.07;
+
+    // How close to center the tag must be to stop correcting (in degrees)
+    private static final double CENTER_THRESHOLD = 5.0;
+
+
     @Override
     public void init() {
         // Define and Initialize Motors
@@ -85,27 +93,26 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+
+        limelight.pipelineSwitch(0);
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit START
-     */
+
     @Override
     public void init_loop() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits START
-     */
+
     @Override
     public void start() {
+
+        limelight.start();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits START but before they hit STOP
-     */
+
     @Override
     public void loop() {
+        // start of drive code
         double y = -gamepad1.left_stick_y;   // Forward/backward
         double x = gamepad1.left_stick_x;    // Strafe left/right
         double turn = gamepad1.right_stick_x; // Rotate in place
@@ -133,15 +140,55 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
-    }
+
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+
+        }
+        // end of drive code
+        // start of lm code
+
+        if (llResult != null && llResult.isValid()) {
+            double tx = llResult.getTx();
+            boolean isCentered = Math.abs(tx) < CENTER_THRESHOLD;
+
+            double turretPower = 0;
+
+            if (!isCentered) {
+
+                double error = tx;
+                integral += error;
+                double derivative = error - lastError;
+
+                turretPower = -(Kp * error + Ki * integral + Kd * derivative);
+
+                if (Math.abs(turretPower) < MIN_POWER) {
+                    turretPower = MIN_POWER * Math.signum(turretPower);
+                }
+
+                turretPower = Math.max(-1.0, Math.min(1.0, turretPower));
+
+                lastError = error;
+            }
+
+            motor.setPower(turretPower);
+            // pretty much the end of lm stuff
+            // start of telemetry stuff
+            Pose3D botPose = llResult.getBotpose_MT2();
+            telemetry.addData("Tag Detected", "YES");
+            telemetry.addData("tx (degrees)", tx);
+            telemetry.addData("Is Centered", isCentered ? "YES" : "NO");
+        } else {
+            // No tag found — stop turret
+            motor.setPower(0);
+            telemetry.addData("Tag Detected", "NO");
+        }
+
+        telemetry.update();
 
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
     }
+
 }
 
 
