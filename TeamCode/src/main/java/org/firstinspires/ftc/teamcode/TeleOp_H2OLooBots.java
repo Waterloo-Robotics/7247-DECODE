@@ -59,8 +59,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 @TeleOp(name="H2O Loo Bots Teleop", group="")
 public class TeleOp_H2OLooBots extends OpMode{
     private Limelight3A limelight;
-    private DcMotor backLeft, backRight, frontLeft, frontRight;
-    private DcMotor motor;  // Turret motor
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor flywheel;
 
     // lm stuff
     private static final double Kp = 0.02;
@@ -83,11 +86,9 @@ public class TeleOp_H2OLooBots extends OpMode{
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
 
         // Turret motor
-        motor = hardwareMap.get(DcMotor.class, "motor");
-        motor.setDirection(DcMotor.Direction.REVERSE); // Change to FORWARD if needed
-
         // Set motor directions for mecanum drive
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
@@ -140,49 +141,6 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
-
-        LLResult llResult = limelight.getLatestResult();
-        if (llResult != null && llResult.isValid()) {
-
-        }
-        // end of drive code
-        // start of lm code
-
-        if (llResult != null && llResult.isValid()) {
-            double tx = llResult.getTx();
-            boolean isCentered = Math.abs(tx) < CENTER_THRESHOLD;
-
-            double turretPower = 0;
-
-            if (!isCentered) {
-
-                double error = tx;
-                integral += error;
-                double derivative = error - lastError;
-
-                turretPower = -(Kp * error + Ki * integral + Kd * derivative);
-
-                if (Math.abs(turretPower) < MIN_POWER) {
-                    turretPower = MIN_POWER * Math.signum(turretPower);
-                }
-
-                turretPower = Math.max(-1.0, Math.min(1.0, turretPower));
-
-                lastError = error;
-            }
-
-            motor.setPower(turretPower);
-            // pretty much the end of lm stuff
-            // start of telemetry stuff
-            Pose3D botPose = llResult.getBotpose_MT2();
-            telemetry.addData("Tag Detected", "YES");
-            telemetry.addData("tx (degrees)", tx);
-            telemetry.addData("Is Centered", isCentered ? "YES" : "NO");
-        } else {
-            // No tag found — stop turret
-            motor.setPower(0);
-            telemetry.addData("Tag Detected", "NO");
-        }
 
         telemetry.update();
 
