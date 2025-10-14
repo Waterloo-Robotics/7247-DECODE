@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 @TeleOp(name="velocityTesting", group="")
-public class velocityTesting extends OpMode {
+public class shooterprototypeTesting extends OpMode {
 
     private DcMotor motor;
     private int motor_speed = 0; // 0 = off, 1-4 = power levels
