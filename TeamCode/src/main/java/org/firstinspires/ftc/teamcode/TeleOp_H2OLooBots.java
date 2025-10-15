@@ -49,6 +49,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
+import java.util.Locale;
+
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
  * The code is structured as an Iterative OpMode
@@ -67,9 +69,12 @@ public class TeleOp_H2OLooBots extends OpMode{
 
     private Limelight3A limelight;
     private IMU imu;
-    private DcMotor backLeft, backRight, frontLeft, frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
     private DcMotor motor;  // Turret motor
-
+    org.firstinspires.ftc.teamcode.GoBildaPinpointDriver odo = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -83,6 +88,9 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
 
         imu = hardwareMap.get(IMU.class, "imu");
+        odo = hardwareMap.get(org.firstinspires.ftc.teamcode.GoBildaPinpointDriver.class, "odo");
+        odo.recalibrateIMU();
+        odo.resetPosAndIMU();
 
         // Turret motor
         motor = hardwareMap.get(DcMotor.class, "motor");
@@ -198,6 +206,14 @@ public class TeleOp_H2OLooBots extends OpMode{
             double x = pose.getX(DistanceUnit.INCH);
             double y = pose.getY(DistanceUnit.INCH);
             double heading = pose.getHeading(AngleUnit.DEGREES);
+
+
+//            gets the current Position (x & y in mm, and heading in degrees) of the robot, and prints it.
+
+            Pose2D pos = odo.getPosition();
+            String data = String.format(Locale.US, "{X: %.2f, Y: %.2f, H: %.2f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Position", data);
+
             while (opModeIsActive()) {
                 // Update the pinpoint sensor
                 pinpoint.update();

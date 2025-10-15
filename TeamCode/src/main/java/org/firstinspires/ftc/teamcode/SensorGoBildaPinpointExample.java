@@ -24,6 +24,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -67,6 +68,10 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 
     double oldTime = 0;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
 
 
     @Override
@@ -74,9 +79,16 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
         /*
         Set the odometry pod positions relative to the point that the odometry computer tracks around.
         The X pod offset refers to how far sideways from the tracking point the
@@ -142,7 +154,33 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
             pull any other data. Only the heading (which you can pull with getHeading() or in getPosition().
              */
             //odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
+            double y = -gamepad1.left_stick_y;   // Forward/backward
+            double x = gamepad1.left_stick_x;    // Strafe left/right
+            double turn = gamepad1.right_stick_x; // Rotate in place
 
+            // Calculate motor powers for mecanum drive
+            double frontLeftPower = y + x + turn;
+            double frontRightPower = y - x - turn;
+            double backLeftPower = y - x + turn;
+            double backRightPower = y + x - turn;
+
+            // Normalize motor powers to stay within [-1.0, 1.0]
+            double max = Math.max(
+                    Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
+                    Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))
+            );
+            if (max > 1.0) {
+                frontLeftPower /= max;
+                frontRightPower /= max;
+                backLeftPower /= max;
+                backRightPower /= max;
+            }
+
+            // Set powers to motors
+            frontLeft.setPower(frontLeftPower);
+            frontRight.setPower(frontRightPower);
+            backLeft.setPower(backLeftPower);
+            backRight.setPower(backRightPower);
 
             if (gamepad1.a){
                 odo.resetPosAndIMU(); //resets the position to 0 and recalibrates the IMU
