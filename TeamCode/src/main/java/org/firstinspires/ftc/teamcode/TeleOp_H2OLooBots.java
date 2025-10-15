@@ -58,7 +58,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 @TeleOp(name="H2O Loo Bots Teleop", group="")
 public class TeleOp_H2OLooBots extends OpMode{
-    private Limelight3A limelight;
     private DcMotor backLeft;
     private DcMotor backRight;
     private DcMotor frontLeft;
@@ -78,6 +77,9 @@ public class TeleOp_H2OLooBots extends OpMode{
     // How close to center the tag must be to stop correcting (in degrees)
     private static final double CENTER_THRESHOLD = 5.0;
 
+    /* Modules */
+    flywheelModule flywheelControl;
+
 
     @Override
     public void init() {
@@ -95,7 +97,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
 
-        limelight.pipelineSwitch(0);
+        flywheelControl = new flywheelModule(flywheel);
     }
 
 
@@ -106,8 +108,6 @@ public class TeleOp_H2OLooBots extends OpMode{
 
     @Override
     public void start() {
-
-        limelight.start();
     }
 
 
@@ -136,6 +136,8 @@ public class TeleOp_H2OLooBots extends OpMode{
             backRightPower /= max;
         }
 
+        flywheelControl.set_speed(1000);
+
         // Set powers to motors
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
@@ -143,8 +145,6 @@ public class TeleOp_H2OLooBots extends OpMode{
         backRight.setPower(backRightPower);
 
         telemetry.update();
-
-
     }
 
 }
