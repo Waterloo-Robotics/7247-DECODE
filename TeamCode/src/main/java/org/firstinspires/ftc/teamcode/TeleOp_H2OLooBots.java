@@ -65,19 +65,6 @@ public class TeleOp_H2OLooBots extends OpMode{
     private DcMotor frontRight;
     private DcMotor flywheel;
 
-    // lm stuff
-    private static final double Kp = 0.02;
-    private static final double Ki = 0.0;
-    private static final double Kd = 0.06;
-
-    private double integral = 0;
-    private double lastError = 0;
-
-    private static final double MIN_POWER = 0.07;
-
-    // How close to center the tag must be to stop correcting (in degrees)
-    private static final double CENTER_THRESHOLD = 5.0;
-
 
     @Override
     public void init() {
