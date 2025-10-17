@@ -34,7 +34,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /*
@@ -66,7 +65,8 @@ public class TeleOp_H2OLooBots extends OpMode{
     /* end of module stuff */
 
     // hood control booleans
-
+    boolean downPressed = gamepad1.dpad_down;
+    boolean upPressed = gamepad1.dpad_up;
 // end of hood control booleans
 
     @Override
@@ -87,7 +87,6 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
-        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // module stuff
         flywheelControl = new flywheelModule(flywheel);
@@ -143,12 +142,16 @@ public class TeleOp_H2OLooBots extends OpMode{
 
         /* start of drive stuff
         ------------------ */
-       intake.setPower(gamepad1.right_trigger);
+
+        if (gamepad1.right_trigger > 0) {
+            intake.setPower(1);
+        }
 
         // start of hood control stuff
 
         // hood control tba
-
+        downPressed = downPressed;
+        upPressed = upPressed;
 
         // end of hood control stuff
 
