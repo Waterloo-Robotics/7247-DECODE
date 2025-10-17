@@ -30,18 +30,11 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
@@ -67,6 +60,14 @@ public class TeleOp_H2OLooBots extends OpMode{
     private DcMotor intake;
     private Servo hood;
 
+    /* start of module stuff */
+    flywheelModule flywheelControl;
+    /* end of module stuff */
+
+// hood control booleans
+    boolean downPressed = gamepad1.dpad_down;
+    boolean upPressed = gamepad1.dpad_up;
+// end of hood control booleans
 
     @Override
     public void init() {
@@ -86,6 +87,9 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+
+        // module stuff
+        flywheelControl = new flywheelModule(flywheel);
     }
 
 
@@ -132,6 +136,24 @@ public class TeleOp_H2OLooBots extends OpMode{
         backRight.setPower(backRightPower);
         /* end of drive code
         ------------------------- */
+
+        //flywheel
+        flywheelControl.set_speed(6000); // will be changed later when velocity is finished
+
+        /* start of drive stuff
+        ------------------ */
+
+        if (gamepad1.right_trigger > 0) {
+            intake.setPower(1);
+        }
+
+        // start of hood control stuff
+
+        // hood control tba
+        downPressed = downPressed;
+        upPressed = upPressed;
+
+        // end of hood control stuff
 
         telemetry.update();
 
