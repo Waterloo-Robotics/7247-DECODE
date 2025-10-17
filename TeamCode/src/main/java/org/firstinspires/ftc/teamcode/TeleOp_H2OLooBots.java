@@ -94,8 +94,6 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
-
-        limelight.pipelineSwitch(0);
     }
 
 
@@ -106,14 +104,13 @@ public class TeleOp_H2OLooBots extends OpMode{
 
     @Override
     public void start() {
-
-        limelight.start();
     }
 
 
     @Override
     public void loop() {
-        // start of drive code
+        /* start of drive code
+        --------------------------*/
         double y = -gamepad1.left_stick_y;   // Forward/backward
         double x = gamepad1.left_stick_x;    // Strafe left/right
         double turn = gamepad1.right_stick_x; // Rotate in place
@@ -141,6 +138,8 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+        /* end of drive code
+        ------------------------- */
 
         telemetry.update();
 
