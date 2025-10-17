@@ -64,16 +64,21 @@ public class TeleOp_H2OLooBots extends OpMode{
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor flywheel;
+    private DcMotor intake;
+    private Servo hood;
 
 
     @Override
     public void init() {
-        // Define and Initialize Motors
+        // start of hardware map stuff ----
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        hood = hardwareMap.get(Servo.class, "hood");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        // end of hardware map stuff
 
         // Turret motor
         // Set motor directions for mecanum drive
