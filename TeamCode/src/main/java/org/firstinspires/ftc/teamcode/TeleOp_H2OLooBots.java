@@ -63,32 +63,27 @@ public class TeleOp_H2OLooBots extends OpMode{
     flywheelModule flywheelControl;
     /* end of module stuff */
 
-    /* Modules */
-    flywheelModule flywheelControl;
-
 // hood control booleans
-    boolean downPressed = gamepad1.dpad_down;
-    boolean upPressed = gamepad1.dpad_up;
 // end of hood control booleans
 
     @Override
     public void init() {
         // start of hardware map stuff ----
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+//        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+//        backRight = hardwareMap.get(DcMotor.class, "backRight");
+//        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+//        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
-        hood = hardwareMap.get(Servo.class, "hood");
-        intake = hardwareMap.get(DcMotor.class, "intake");
+//        hood = hardwareMap.get(Servo.class, "hood");
+//        intake = hardwareMap.get(DcMotor.class, "intake");
         // end of hardware map stuff
 
         // Turret motor
         // Set motor directions for mecanum drive
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+//        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+//        frontRight.setDirection(DcMotor.Direction.FORWARD);
+//        backLeft.setDirection(DcMotor.Direction.REVERSE);
+//        backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // module stuff
         flywheelControl = new flywheelModule(flywheel);
@@ -131,34 +126,37 @@ public class TeleOp_H2OLooBots extends OpMode{
             backRightPower /= max;
         }
 
-        flywheelControl.set_speed(1000);
 
         // Set powers to motors
-        frontLeft.setPower(frontLeftPower);
-        frontRight.setPower(frontRightPower);
-        backLeft.setPower(backLeftPower);
-        backRight.setPower(backRightPower);
+//        frontLeft.setPower(frontLeftPower);
+//        frontRight.setPower(frontRightPower);
+//        backLeft.setPower(backLeftPower);
+//        backRight.setPower(backRightPower);
         /* end of drive code
         ------------------------- */
 
         //flywheel
-        flywheelControl.set_speed(6000); // will be changed later when velocity is finished
+        flywheelControl.set_speed(-2500);// will be changed later when velocity is finished
 
         /* start of drive stuff
         ------------------ */
 
-        if (gamepad1.right_trigger > 0) {
-            intake.setPower(1);
-        }
-
-        // start of hood control stuff
-
-        // hood control tba
-        downPressed = downPressed;
-        upPressed = upPressed;
+//        if (gamepad1.right_trigger > 0) {
+//            intake.setPower(1);
+//        }
+//
+//        // start of hood control stuff
+//
+//        // hood control tba
+//        downPressed = downPressed;
+//        upPressed = upPressed;
 
         // end of hood control stuff
 
+        telemetry.addData("PID Error", flywheelControl.pid_controller.error);
+        telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
+        telemetry.addData("Feedforward", flywheelControl.feedforward_power);
+        telemetry.addData("PID", flywheelControl.pid_power);
         telemetry.update();
     }
 
