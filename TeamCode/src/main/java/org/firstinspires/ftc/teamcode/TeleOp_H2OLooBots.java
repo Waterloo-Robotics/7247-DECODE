@@ -64,9 +64,8 @@ public class TeleOp_H2OLooBots extends OpMode{
     flywheelModule flywheelControl;
     /* end of module stuff */
 
-// hood control booleans
-    boolean downPressed = gamepad1.dpad_down;
-    boolean upPressed = gamepad1.dpad_up;
+    // hood control booleans
+
 // end of hood control booleans
 
     @Override
@@ -150,8 +149,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         // start of hood control stuff
 
         // hood control tba
-        downPressed = downPressed;
-        upPressed = upPressed;
+
 
         // end of hood control stuff
 
@@ -161,7 +159,6 @@ public class TeleOp_H2OLooBots extends OpMode{
     }
 
 }
-
 
 
 
