@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -51,13 +52,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="H2O Loo Bots Teleop", group="")
 public class TeleOp_H2OLooBots extends OpMode{
-    private DcMotor backLeft;
-    private DcMotor backRight;
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
+ //   private DcMotor backLeft;
+ //   private DcMotor backRight;
+  //  private DcMotor frontLeft;
+ //   private DcMotor frontRight;
     private DcMotor flywheel;
-    private DcMotor intake;
-    private Servo hood;
+//    private DcMotor intake;
+  //  private Servo hood;
 
     /* start of module stuff */
     flywheelModule flywheelControl;
@@ -104,7 +105,7 @@ public class TeleOp_H2OLooBots extends OpMode{
     public void loop() {
         /* start of drive code
         --------------------------*/
-        double y = -gamepad1.left_stick_y;   // Forward/backward
+    /*    double y = -gamepad1.left_stick_y;   // Forward/backward
         double x = gamepad1.left_stick_x;    // Strafe left/right
         double turn = gamepad1.right_stick_x; // Rotate in place
 
@@ -123,7 +124,7 @@ public class TeleOp_H2OLooBots extends OpMode{
             frontLeftPower /= max;
             frontRightPower /= max;
             backLeftPower /= max;
-            backRightPower /= max;
+            backRightPower /= max;         *.
         }
 
 
@@ -136,8 +137,8 @@ public class TeleOp_H2OLooBots extends OpMode{
         ------------------------- */
 
         //flywheel
-        flywheelControl.set_speed(-2500);// will be changed later when velocity is finished
-
+        flywheelControl.set_speed();// will be changed later when velocity is finished
+        if (gamepad1.)
         /* start of drive stuff
         ------------------ */
 
