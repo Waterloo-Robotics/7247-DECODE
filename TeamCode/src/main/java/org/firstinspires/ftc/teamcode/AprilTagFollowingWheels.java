@@ -101,7 +101,8 @@ public class AprilTagFollowingWheels extends OpMode {
 
             // Display "No Tag Detected" in telemetry
             telemetry.addData("Tag Detected", "NO");
-        }
+
+
 
         telemetry.update();
     }
