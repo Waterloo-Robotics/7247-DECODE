@@ -63,6 +63,7 @@ public class TeleOp_H2OLooBots extends OpMode{
     /* start of module stuff */
     flywheelModule flywheelControl;
     /* end of module stuff */
+    private double flywheelRPM;
 
 // hood control booleans
 // end of hood control booleans
@@ -88,6 +89,7 @@ public class TeleOp_H2OLooBots extends OpMode{
 
         // module stuff
         flywheelControl = new flywheelModule(flywheel);
+        flywheelRPM = 0;
     }
 
 
@@ -137,8 +139,21 @@ public class TeleOp_H2OLooBots extends OpMode{
         ------------------------- */
 
         //flywheel
-        flywheelControl.set_speed();// will be changed later when velocity is finished
-        if (gamepad1.)
+        // flywheelControl.set_speed();// will be changed later when velocity is finished
+        flywheelRPM += gamepad1.left_stick_y * 25;
+
+        if (flywheelRPM > 0)
+        {
+            flywheelRPM = 0;
+        }
+        else if (flywheelRPM < -4200)
+        {
+            flywheelRPM = -4200;
+
+        }
+
+        flywheelControl.set_speed((int)flywheelRPM);
+
         /* start of drive stuff
         ------------------ */
 
@@ -158,6 +173,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID", flywheelControl.pid_power);
+        telemetry.addData("Left Stick", gamepad1.left_stick_y);
         telemetry.update();
     }
 
