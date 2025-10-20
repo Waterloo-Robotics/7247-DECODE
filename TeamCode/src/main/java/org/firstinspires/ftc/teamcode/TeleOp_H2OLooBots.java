@@ -30,18 +30,11 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
@@ -64,29 +57,29 @@ public class TeleOp_H2OLooBots extends OpMode{
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor flywheel;
+    private DcMotor intake;
+    private Servo hood;
 
-    // lm stuff
-    private static final double Kp = 0.02;
-    private static final double Ki = 0.0;
-    private static final double Kd = 0.06;
+    /* start of module stuff */
+    flywheelModule flywheelControl;
+    /* end of module stuff */
 
-    private double integral = 0;
-    private double lastError = 0;
-
-    private static final double MIN_POWER = 0.07;
-
-    // How close to center the tag must be to stop correcting (in degrees)
-    private static final double CENTER_THRESHOLD = 5.0;
-
+    // hood control booleans
+    boolean downPressed = gamepad1.dpad_down;
+    boolean upPressed = gamepad1.dpad_up;
+// end of hood control booleans
 
     @Override
     public void init() {
-        // Define and Initialize Motors
+        // start of hardware map stuff ----
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        hood = hardwareMap.get(Servo.class, "hood");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        // end of hardware map stuff
 
         // Turret motor
         // Set motor directions for mecanum drive
@@ -95,7 +88,8 @@ public class TeleOp_H2OLooBots extends OpMode{
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
 
-        limelight.pipelineSwitch(0);
+        // module stuff
+        flywheelControl = new flywheelModule(flywheel);
     }
 
 
@@ -106,14 +100,13 @@ public class TeleOp_H2OLooBots extends OpMode{
 
     @Override
     public void start() {
-
-        limelight.start();
     }
 
 
     @Override
     public void loop() {
-        // start of drive code
+        /* start of drive code
+        --------------------------*/
         double y = -gamepad1.left_stick_y;   // Forward/backward
         double x = gamepad1.left_stick_x;    // Strafe left/right
         double turn = gamepad1.right_stick_x; // Rotate in place
@@ -141,6 +134,26 @@ public class TeleOp_H2OLooBots extends OpMode{
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+        /* end of drive code
+        ------------------------- */
+
+        //flywheel
+        flywheelControl.set_speed(6000); // will be changed later when velocity is finished
+
+        /* start of drive stuff
+        ------------------ */
+
+        if (gamepad1.right_trigger > 0) {
+            intake.setPower(1);
+        }
+
+        // start of hood control stuff
+
+        // hood control tba
+        downPressed = downPressed;
+        upPressed = upPressed;
+
+        // end of hood control stuff
 
         telemetry.update();
 
@@ -148,7 +161,6 @@ public class TeleOp_H2OLooBots extends OpMode{
     }
 
 }
-
 
 
 
