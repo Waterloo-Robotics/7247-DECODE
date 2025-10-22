@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class limelightModuleTest extends OpMode {
 
     private Limelight3A limelight;
-    private LimelightProcessingModule llResult;
+    private LimelightProcessingModule llModule;
 
     @Override
     public void init() {
@@ -20,7 +20,7 @@ public class limelightModuleTest extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         // Create LimelightProcessingModule instance
-        llResult = new LimelightProcessingModule(limelight);
+        llModule = new LimelightProcessingModule(limelight);
 
         telemetry.addData("Status", "Initialized");
     }
@@ -28,7 +28,7 @@ public class limelightModuleTest extends OpMode {
     @Override
     public void loop() {
         // Get the result from the Limelight
-        Pose2D pose = llResult.limelightResult();
+        Pose2D pose = llModule.limelightResult();
 
         if (pose != null) {
             telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
