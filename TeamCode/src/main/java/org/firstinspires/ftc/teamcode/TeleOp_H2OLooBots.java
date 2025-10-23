@@ -58,7 +58,11 @@ public class TeleOp_H2OLooBots extends OpMode{
  //   private DcMotor frontRight;
     private DcMotor flywheel;
 //    private DcMotor intake;
-  //  private Servo hood;
+    private Servo hood;
+    private double hoodPosition = 0.0; // 0.0 = 0°, 1.0 = 180° (approx.)
+    private final double SERVO_MIN_ANGLE = 0.0;
+    private final double SERVO_MAX_ANGLE = 180.0;
+
 
     /* start of module stuff */
     flywheelModule flywheelControl;
@@ -76,7 +80,7 @@ public class TeleOp_H2OLooBots extends OpMode{
 //        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
 //        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
-//        hood = hardwareMap.get(Servo.class, "hood");
+        hood = hardwareMap.get(Servo.class, "hood");
 //        intake = hardwareMap.get(DcMotor.class, "intake");
         // end of hardware map stuff
 
@@ -142,6 +146,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         // flywheelControl.set_speed();// will be changed later when velocity is finished
         flywheelRPM += gamepad1.left_stick_y * 25;
 
+
         if (flywheelRPM > 0)
         {
             flywheelRPM = 0;
@@ -163,9 +168,15 @@ public class TeleOp_H2OLooBots extends OpMode{
 //
 //        // start of hood control stuff
 //
-//        // hood control tba
+        // hood control tba
 //        downPressed = downPressed;
 //        upPressed = upPressed;
+        // Control servo with gamepad
+        if (gamepad1.dpad_up && hoodPosition < 1.0) {
+            hoodPosition += 0.01;
+        } else if (gamepad1.dpad_down && hoodPosition > 0.0) {
+            hoodPosition -= 0.01;
+        }
 
         // end of hood control stuff
 
@@ -174,6 +185,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID", flywheelControl.pid_power);
         telemetry.addData("Left Stick", gamepad1.left_stick_y);
+        telemetry.addLine("Ready to track servo angle");
         telemetry.update();
     }
 
