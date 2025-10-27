@@ -46,9 +46,9 @@ public class PinpointTest extends OpMode {
 
     @Override
     public void loop() {
-        double y = -gamepad1.left_stick_y;   // Forward/backward
-        double x = gamepad1.left_stick_x;    // Strafe left/right
-        double turn = gamepad1.right_stick_x; // Rotate in place
+        double y = -gamepad1.left_stick_y * 0.6;   // Forward/backward
+        double x = gamepad1.left_stick_x * 0.6;    // Strafe left/right
+        double turn = gamepad1.right_stick_x * 0.6; // Rotate in place
 
         // Calculate motor powers for mecanum drive
         double frontLeftPower = y + x + turn;
