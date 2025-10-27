@@ -58,7 +58,8 @@ public class TeleOp_H2OLooBots extends OpMode{
  //   private DcMotor frontRight;
     private DcMotor flywheel;
 //    private DcMotor intake;
-  //  private Servo hood;
+    private Servo hood;
+    private double hoodPosition = 0.0;
 
     /* start of module stuff */
     flywheelModule flywheelControl;
@@ -76,7 +77,7 @@ public class TeleOp_H2OLooBots extends OpMode{
 //        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
 //        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
-//        hood = hardwareMap.get(Servo.class, "hood");
+        hood = hardwareMap.get(Servo.class, "hood");
 //        intake = hardwareMap.get(DcMotor.class, "intake");
         // end of hardware map stuff
 
@@ -161,12 +162,14 @@ public class TeleOp_H2OLooBots extends OpMode{
 //            intake.setPower(1);
 //        }
 //
-//        // start of hood control stuff
-//
-//        // hood control tba
-//        downPressed = downPressed;
-//        upPressed = upPressed;
 
+        // start of hood control stuff
+        // Control servo with gamepad
+        if (gamepad1.dpad_up && hoodPosition < 1.0) {
+            hoodPosition += 0.01;
+        } else if (gamepad1.dpad_down && hoodPosition > 0.0) {
+            hoodPosition -= 0.01;
+        }
         // end of hood control stuff
 
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
