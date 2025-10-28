@@ -36,7 +36,7 @@ public Limelight3A limelight;
         if (llResult != null && llResult.isValid())
         {
             List<LLResultTypes.FiducialResult> results = llResult.getFiducialResults();
-            Pose3D robot_pose = results.get(0).getTargetPoseRobotSpace();
+            Pose3D robot_pose = results.get(0).getRobotPoseTargetSpace();
 
             double x = robot_pose.getPosition().toUnit(DistanceUnit.INCH).z;
             double y = robot_pose.getPosition().toUnit(DistanceUnit.INCH).y;
