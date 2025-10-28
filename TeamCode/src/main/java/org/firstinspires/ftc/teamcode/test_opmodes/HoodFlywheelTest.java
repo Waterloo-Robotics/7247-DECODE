@@ -1,11 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.test_opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="HoodFly Test", group="")
+import org.firstinspires.ftc.teamcode.modules.flywheelModule;
+
+@TeleOp(name="HoodFly Setpoint Test", group="TestOpMode")
 public class HoodFlywheelTest extends OpMode {
     private DcMotor flywheel;
     private Servo hood;
