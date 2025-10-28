@@ -20,7 +20,7 @@ public class limelightModuleTest extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         // Create LimelightProcessingModule instance
-        llModule = new LimelightProcessingModule(limelight);
+        llModule = new LimelightProcessingModule(limelight, telemetry);
 
         telemetry.addData("Status", "Initialized");
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
@@ -10,17 +11,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
+import java.util.List;
+
 public class LimelightProcessingModule {
 
     Telemetry telemetry;
 
 public Limelight3A limelight;
-    public LimelightProcessingModule(Limelight3A limelight)
+    public LimelightProcessingModule(Limelight3A limelight, Telemetry telemetry)
     {
-    this.limelight = limelight;
-    this.limelight.start();
-    this.limelight.pipelineSwitch(0);
-
+        this.telemetry = telemetry;
+        this.limelight = limelight;
+        this.limelight.pipelineSwitch(0);
+        this.limelight.start();
     }
     /* ------ */
     /* limelightResult
@@ -32,10 +35,10 @@ public Limelight3A limelight;
 
         if (llResult != null && llResult.isValid())
         {
-            Pose3D robot_pose = llResult.getBotpose();
+            List<LLResultTypes.FiducialResult> results = llResult.getFiducialResults();
+            Pose3D robot_pose = results.get(0).getTargetPoseRobotSpace();
 
-
-            double x = robot_pose.getPosition().toUnit(DistanceUnit.INCH).x;
+            double x = robot_pose.getPosition().toUnit(DistanceUnit.INCH).z;
             double y = robot_pose.getPosition().toUnit(DistanceUnit.INCH).y;
             double rot = robot_pose.getOrientation().getYaw(AngleUnit.DEGREES);
             return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, rot);
