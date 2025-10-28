@@ -177,6 +177,7 @@ public class HoodTest extends OpMode{
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID", flywheelControl.pid_power);
         telemetry.addData("Left Stick", gamepad1.left_stick_y);
+        telemetry.addData("Hood Servo", hood.getPosition());
         telemetry.update();
     }
 
