@@ -164,10 +164,10 @@ public class HoodTest extends OpMode{
         // start of hood control stuff
         // Control servo with gamepad
         if (gamepad1.dpad_up && hoodPosition < 1.0) {
-            hoodPosition += 0.01;
+            hoodPosition += 0.0001;
 
         } else if (gamepad1.dpad_down && hoodPosition > 0.0) {
-            hoodPosition -= 0.01;
+            hoodPosition -= 0.0001;
         }
         hood.setPosition(hoodPosition);
         // end of hood control stuff
