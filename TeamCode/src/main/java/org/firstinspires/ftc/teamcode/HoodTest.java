@@ -30,8 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,14 +48,14 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="H2O Loo Bots Teleop", group="LinearOpMode")
-public class TeleOp_H2OLooBots extends OpMode{
-    private DcMotor backLeft;
-    private DcMotor backRight;
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
+@TeleOp(name="Hood Test", group="LinearOpMode")
+public class HoodTest extends OpMode{
+ //   private DcMotor backLeft;
+ //   private DcMotor backRight;
+  //  private DcMotor frontLeft;
+ //   private DcMotor frontRight;
     private DcMotor flywheel;
-    private DcMotor intake;
+//    private DcMotor intake;
     private Servo hood;
     private double hoodPosition = 0.0;
 
@@ -72,21 +70,21 @@ public class TeleOp_H2OLooBots extends OpMode{
     @Override
     public void init() {
         // start of hardware map stuff ----
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+//        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+//        backRight = hardwareMap.get(DcMotor.class, "backRight");
+//        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+//        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         hood = hardwareMap.get(Servo.class, "hood");
-        intake = hardwareMap.get(DcMotor.class, "intake");
+//        intake = hardwareMap.get(DcMotor.class, "intake");
         // end of hardware map stuff
 
         // Turret motor
         // Set motor directions for mecanum drive
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+//        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+//        frontRight.setDirection(DcMotor.Direction.FORWARD);
+//        backLeft.setDirection(DcMotor.Direction.REVERSE);
+//        backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // module stuff
         flywheelControl = new flywheelModule(flywheel);
@@ -108,7 +106,7 @@ public class TeleOp_H2OLooBots extends OpMode{
     public void loop() {
         /* start of drive code
         --------------------------*/
-        double y = -gamepad1.left_stick_y;   // Forward/backward
+    /*    double y = -gamepad1.left_stick_y;   // Forward/backward
         double x = gamepad1.left_stick_x;    // Strafe left/right
         double turn = gamepad1.right_stick_x; // Rotate in place
 
@@ -127,15 +125,15 @@ public class TeleOp_H2OLooBots extends OpMode{
             frontLeftPower /= max;
             frontRightPower /= max;
             backLeftPower /= max;
-            backRightPower /= max;
+            backRightPower /= max;         *.
         }
 
 
         // Set powers to motors
-        frontLeft.setPower(frontLeftPower);
-        frontRight.setPower(frontRightPower);
-        backLeft.setPower(backLeftPower);
-        backRight.setPower(backRightPower);
+//        frontLeft.setPower(frontLeftPower);
+//        frontRight.setPower(frontRightPower);
+//        backLeft.setPower(backLeftPower);
+//        backRight.setPower(backRightPower);
         /* end of drive code
         ------------------------- */
 
@@ -158,15 +156,16 @@ public class TeleOp_H2OLooBots extends OpMode{
         /* start of drive stuff
         ------------------ */
 
-        if (gamepad1.right_trigger > 0) {
-            intake.setPower(1);
-        }
-
+//        if (gamepad1.right_trigger > 0) {
+//            intake.setPower(1);
+//        }
+//
 
         // start of hood control stuff
         // Control servo with gamepad
         if (gamepad1.dpad_up && hoodPosition < 1.0) {
             hoodPosition += 0.01;
+
         } else if (gamepad1.dpad_down && hoodPosition > 0.0) {
             hoodPosition -= 0.01;
         }
