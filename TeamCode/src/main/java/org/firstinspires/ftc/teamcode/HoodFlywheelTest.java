@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@TeleOp(name="HoodFly Test", group="")
 public class HoodFlywheelTest extends OpMode {
     private DcMotor flywheel;
     private Servo hood;
@@ -30,7 +32,7 @@ public class HoodFlywheelTest extends OpMode {
     public void loop() {
 
         if (gamepad1.dpad_left) {
-
+            hood.setPosition(0.417);
             flywheelRPM = -3500;
             flywheelControl.set_speed((int) flywheelRPM);
 
