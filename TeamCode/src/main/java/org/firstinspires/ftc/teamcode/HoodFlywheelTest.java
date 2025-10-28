@@ -29,6 +29,12 @@ public class HoodFlywheelTest extends OpMode {
     @Override
     public void loop() {
 
+        if (gamepad1.dpad_left) {
+
+            flywheelRPM = -3500;
+            flywheelControl.set_speed((int) flywheelRPM);
+
+        }
     }
 }
 
