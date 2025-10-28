@@ -37,6 +37,11 @@ public class HoodFlywheelTest extends OpMode {
             flywheelControl.set_speed((int) flywheelRPM);
 
         }
+
+        if (gamepad1.a) {
+            flywheelRPM = 0;
+            flywheelControl.set_speed((int) flywheelRPM);
+        }
     }
 }
 
