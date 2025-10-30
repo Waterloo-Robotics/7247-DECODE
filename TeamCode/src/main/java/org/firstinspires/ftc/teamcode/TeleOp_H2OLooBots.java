@@ -97,12 +97,12 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM += rightTrigger * 50;   // faster press → faster ramp up
         flywheelRPM -= leftTrigger * 50;    // faster press → faster ramp down
 
-        // Triangle (Y) stops flywheel instantly
+        // Triangle to stop flywheel fast without triggers
         if (gamepad1.y) {
             flywheelRPM = 0;
         }
 
-        // Clamp RPM
+        // FLYWHEEL
         if (flywheelRPM < 0) flywheelRPM = 0;
         if (flywheelRPM > 4200) flywheelRPM = 4200;
 
@@ -131,8 +131,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         } else {
             telemetry.addData("Limelight", "No valid target");
         }
-
-
 
         /* ---------------- GENERAL TELEMETRY ---------------- */
         telemetry.addData("Flywheel RPM", flywheelRPM);
