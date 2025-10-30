@@ -28,13 +28,16 @@
  */
 
 package org.firstinspires.ftc.teamcode;
-
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
 /*
@@ -60,6 +63,9 @@ public class TeleOp_H2OLooBots extends OpMode{
     private DcMotor intake;
     private Servo hood;
     private double hoodPosition = 0.0;
+    private Limelight3A limelight;
+    private LimelightProcessingModule llModule;
+
 
     /* start of module stuff */
     flywheelModule flywheelControl;
@@ -79,6 +85,7 @@ public class TeleOp_H2OLooBots extends OpMode{
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         hood = hardwareMap.get(Servo.class, "hood");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
         // end of hardware map stuff
 
         // Turret motor
@@ -91,6 +98,11 @@ public class TeleOp_H2OLooBots extends OpMode{
         // module stuff
         flywheelControl = new flywheelModule(flywheel);
         flywheelRPM = 0;
+
+
+
+        // Create LimelightProcessingModule instance
+        llModule = new LimelightProcessingModule(limelight, telemetry);
     }
 
 
@@ -172,6 +184,15 @@ public class TeleOp_H2OLooBots extends OpMode{
         }
         hood.setPosition(hoodPosition);
         // end of hood control stuff
+        Pose2D pose = llModule.limelightResult();
+
+        if (pose != null) {
+            telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
+            telemetry.addData("Y (inches)", pose.getY(DistanceUnit.INCH));
+            telemetry.addData("Rotation (degrees)", pose.getHeading(AngleUnit.DEGREES));
+        } else {
+            telemetry.addData("Limelight", "No valid target");
+        }
 
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
