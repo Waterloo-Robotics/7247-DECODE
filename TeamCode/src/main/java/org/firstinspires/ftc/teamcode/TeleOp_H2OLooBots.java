@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
-@TeleOp(name="H2O Loo Bots Teleop (Limelight Integrated)", group="LinearOpMode")
+@TeleOp(name="H2O Loo Bots Teleop", group="LinearOpMode")
 public class TeleOp_H2OLooBots extends OpMode {
 
     /* ---------- Drive Motors ---------- */
