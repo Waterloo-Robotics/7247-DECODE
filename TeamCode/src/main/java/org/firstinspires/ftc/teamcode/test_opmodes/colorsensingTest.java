@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.test_opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-
+@TeleOp
 public class colorsensingTest extends LinearOpMode {
 
     private ColorSensor colorSensor;
@@ -28,11 +29,11 @@ public class colorsensingTest extends LinearOpMode {
 
             // Check if the detected color is closer to green or purple
             if (isGreen(red, green, blue)) {
-                // Move the servo to position for green (e.g., position 0.0)
-                beaconLight.setPosition(0.0);  // Green
+                // Move the servo to position for green (e.g., position 0.450)
+                beaconLight.setPosition(0.450);  // Green
             } else if (isPurple(red, green, blue)) {
-                // Move the servo to position for purple (e.g., position 1.0)
-                beaconLight.setPosition(1.0);  // Purple
+                // Move the servo to position for purple (e.g., position 0.722)
+                beaconLight.setPosition(0.722);  // Purple
             }
 
             // Add a small delay to make it responsive
