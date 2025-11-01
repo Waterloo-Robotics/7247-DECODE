@@ -129,9 +129,9 @@ public class TeleOp_H2OLooBots extends OpMode {
         /* ---------------- HOOD CONTROL ---------------- */
         // Increment/decrement hood position gradually
         if (gamepad1.dpad_up) {
-            hoodPosition += 0.005;
+            hoodPosition -= 0.005;  // pressing up raises the hood
         } else if (gamepad1.dpad_down) {
-            hoodPosition -= 0.005;
+            hoodPosition += 0.005;  // pressing down lowers the hood
         }
 
         // Clamp servo range
@@ -167,13 +167,15 @@ public class TeleOp_H2OLooBots extends OpMode {
         }
 
         /* ---------------- GENERAL TELEMETRY ---------------- */
+        telemetry.addLine("-- Flywheel Stuff: --");
         telemetry.addData("Flywheel RPM", flywheelRPM);
-        telemetry.addData("Hood Position", hoodPosition);
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
+        telemetry.addLine("-- Other: --");
         telemetry.addData("Intake Power", intake.getPower());
         telemetry.update();
+        telemetry.addData("Hood Pos", hood.getPosition());
     }
 }
