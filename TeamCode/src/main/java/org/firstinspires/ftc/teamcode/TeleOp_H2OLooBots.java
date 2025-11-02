@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -28,6 +29,9 @@ public class TeleOp_H2OLooBots extends OpMode {
     private flywheelModule flywheelControl;
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
+    private ColorSensor colorSensor;
+    private Servo leftLED;
+    private Servo rightLED;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 0.4; // start in mid position
@@ -37,6 +41,10 @@ public class TeleOp_H2OLooBots extends OpMode {
     private enum IntakeState { OFF, INTAKE, REVERSE }
     private IntakeState intakeState = IntakeState.OFF;
     private boolean previousRightBumper = false;
+    private static final double GREEN_POS = 0.5;
+    private static final double BLUE_POS = 0.611;
+    private static final double PURPLE_POS = 0.772;
+    private long lastSeenTime = 0;
 
     @Override
     public void init() {
@@ -49,6 +57,9 @@ public class TeleOp_H2OLooBots extends OpMode {
         intake = hardwareMap.get(DcMotor.class, "intake");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+        leftLED = hardwareMap.get(Servo.class, "leftLED");
+        rightLED = hardwareMap.get(Servo.class, "rightLED");
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -62,6 +73,10 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM = 0;
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
+
+        setLEDs(BLUE_POS);
+        lastSeenTime = System.currentTimeMillis();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -104,20 +119,16 @@ public class TeleOp_H2OLooBots extends OpMode {
         /* ---------------- INTAKE CONTROL ---------------- */
         boolean rightPressed = gamepad1.right_bumper && !previousRightBumper;
 
-        // Toggle forward intake with right bumper
         if (rightPressed) {
             intakeState = (intakeState == IntakeState.INTAKE) ? IntakeState.OFF : IntakeState.INTAKE;
         }
 
-        // Hold left bumper to reverse intake
         if (gamepad1.left_bumper) {
             intakeState = IntakeState.REVERSE;
         } else if (intakeState == IntakeState.REVERSE) {
-            // Automatically return to forward intake
             intakeState = IntakeState.INTAKE;
         }
 
-        // Apply motor power
         switch (intakeState) {
             case OFF: intake.setPower(0.0); break;
             case INTAKE: intake.setPower(1.0); break;
@@ -127,31 +138,26 @@ public class TeleOp_H2OLooBots extends OpMode {
         previousRightBumper = gamepad1.right_bumper;
 
         /* ---------------- HOOD CONTROL ---------------- */
-        // Increment/decrement hood position gradually
         if (gamepad1.dpad_up) {
             hoodPosition -= 0.005;  // pressing up raises the hood
         } else if (gamepad1.dpad_down) {
             hoodPosition += 0.005;  // pressing down lowers the hood
         }
 
-        // Clamp servo range
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        // Presets for shot distances
         if (gamepad1.dpad_left) {
-            hoodPosition = 0.417; // long shot
+            hoodPosition = 0.417;
             flywheelRPM = 3500;
         }
 
         if (gamepad1.dpad_right) {
-            hoodPosition = 0.25; // close shot
+            hoodPosition = 0.25;
             flywheelRPM = 2500;
         }
 
-        // Reset flywheel if needed
         if (gamepad1.a) flywheelRPM = 0;
 
-        // Apply servo and flywheel
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
@@ -166,6 +172,35 @@ public class TeleOp_H2OLooBots extends OpMode {
             telemetry.addData("Limelight", "No valid target");
         }
 
+
+        // COLOR SENSING + LED CONTROL
+        double red = colorSensor.red();
+        double green = colorSensor.green();
+        double blue = colorSensor.blue();
+
+        boolean colorDetected = false;
+
+        if (isGreen(red, green, blue)) {
+            setLEDs(GREEN_POS);
+            lastSeenTime = System.currentTimeMillis();
+            colorDetected = true;
+            telemetry.addLine("Detected: Green");
+        } else if (isPurple(red, green, blue)) {
+            setLEDs(PURPLE_POS);
+            lastSeenTime = System.currentTimeMillis();
+            colorDetected = true;
+            telemetry.addLine("Detected: Purple");
+        }
+
+        if (!colorDetected && System.currentTimeMillis() - lastSeenTime > 3000) {
+            setLEDs(BLUE_POS);
+            telemetry.addLine("No color detected for 3s → Blue");
+        }
+
+        telemetry.addData("Color - Red", red);
+        telemetry.addData("Color - Green", green);
+        telemetry.addData("Color - Blue", blue);
+
         /* ---------------- GENERAL TELEMETRY ---------------- */
         telemetry.addLine("-- Flywheel Stuff: --");
         telemetry.addData("Flywheel RPM", flywheelRPM);
@@ -175,7 +210,20 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addLine("-- Other: --");
         telemetry.addData("Intake Power", intake.getPower());
-        telemetry.update();
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.update();
+    }
+    // helper stuff for color detection
+    private void setLEDs(double position) {
+        leftLED.setPosition(position);
+        rightLED.setPosition(position);
+    }
+
+    private boolean isGreen(double red, double green, double blue) {
+        return green > red * 1.3 && green > blue * 1.3 && green > 50;
+    }
+
+    private boolean isPurple(double red, double green, double blue) {
+        return red > 60 && blue > 60 && green < (red + blue) / 3;
     }
 }
