@@ -40,7 +40,8 @@ public class colorsensingTest extends LinearOpMode {
         lastSeenTime = System.currentTimeMillis();
 
         // Start with the servo in blue position
-        beaconLight.setPosition(BLUE_POSITION);
+        leftLED.setPosition(BLUE_POSITION);
+        rightLED.setPosition(BLUE_POSITION);
 
         lastColorTime = System.currentTimeMillis();
 
@@ -70,7 +71,6 @@ public class colorsensingTest extends LinearOpMode {
         // If no color detected for 3 seconds, turn blue
         if (!colorDetected && System.currentTimeMillis() - lastSeenTime > 3000) {
             setLEDs(BLUE_POS);
-            telemetry.addLine("No color detected for 3s → Blue");
         }
 
         telemetry.addData("Red", red);
