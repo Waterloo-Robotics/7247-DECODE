@@ -23,6 +23,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor frontRight;
     private DcMotor flywheel;
     private DcMotor intake;
+    private DcMotor transfer;
     private Servo hood;
 
     /* ---------- Modules & Sensors ---------- */
@@ -36,6 +37,9 @@ public class TeleOp_H2OLooBots extends OpMode {
     /* ---------- Variables ---------- */
     private double hoodPosition = 0.4; // start in mid position
     private double flywheelRPM;
+
+    // Transfer motor state
+    private boolean transferActive = false; // Variable to track the state of the transfer motor
 
     // Intake state management
     private enum IntakeState { OFF, INTAKE, REVERSE }
@@ -55,6 +59,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        transfer = hardwareMap.get(DcMotor.class, "transfer"); // Initialize transfer motor
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
@@ -129,6 +134,7 @@ public class TeleOp_H2OLooBots extends OpMode {
             intakeState = IntakeState.INTAKE;
         }
 
+        // Apply motor power for intake
         switch (intakeState) {
             case OFF: intake.setPower(0.0); break;
             case INTAKE: intake.setPower(1.0); break;
@@ -137,11 +143,19 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         previousRightBumper = gamepad1.right_bumper;
 
+        /* ---------------- TRANSFER MOTOR CONTROL ---------------- */
+        if (gamepad1.a) {
+            transferActive = !transferActive; // Toggle transfer motor state on X button press
+        }
+
+        // Run transfer motor at full power if active, otherwise stop it
+        transfer.setPower(transferActive ? 1.0 : 0.0);
+
         /* ---------------- HOOD CONTROL ---------------- */
         if (gamepad1.dpad_up) {
-            hoodPosition -= 0.005;  // pressing up raises the hood
+            hoodPosition += 0.005;
         } else if (gamepad1.dpad_down) {
-            hoodPosition += 0.005;  // pressing down lowers the hood
+            hoodPosition -= 0.005;
         }
 
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
@@ -202,13 +216,13 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Color - Blue", blue);
 
         /* ---------------- GENERAL TELEMETRY ---------------- */
-        telemetry.addLine("-- Flywheel Stuff: --");
         telemetry.addData("Flywheel RPM", flywheelRPM);
+        telemetry.addData("Hood Position", hoodPosition);
+        telemetry.addData("Transfer Active", transferActive ? "ON" : "OFF"); // Display transfer motor status
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
-        telemetry.addLine("-- Other: --");
         telemetry.addData("Intake Power", intake.getPower());
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.update();
