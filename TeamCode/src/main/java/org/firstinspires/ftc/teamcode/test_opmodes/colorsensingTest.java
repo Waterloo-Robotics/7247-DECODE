@@ -4,12 +4,21 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-@TeleOp
+
+@TeleOp(name = "colorsensingTest")
 public class colorsensingTest extends LinearOpMode {
 
     private ColorSensor colorSensor;
-    private Servo beaconLight;  // The beacon is controlled by a servo
+    private Servo leftLED;
+    private Servo rightLED;
+
     private double red, green, blue;
+    private long lastSeenTime;
+
+    // Servo positions
+    private static final double GREEN_POS = 0.5;
+    private static final double BLUE_POS = 0.611;
+    private static final double PURPLE_POS = 0.772;
 
     private double lastColorTime;  // To track the time when the color was last seen
     private double lastColorPosition = 0.611;  // Default to blue initially
@@ -21,63 +30,71 @@ public class colorsensingTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Initialize the color sensor and beacon servo
+        // Initialize color sensor and both beacon LEDs
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
-        beaconLight = hardwareMap.get(Servo.class, "beaconLight"); // Servo that controls the beacon
+        leftLED = hardwareMap.get(Servo.class, "leftLED");
+        rightLED = hardwareMap.get(Servo.class, "rightLED");
+
+        // Start blue
+        setLEDs(BLUE_POS);
+        lastSeenTime = System.currentTimeMillis();
 
         // Start with the servo in blue position
         beaconLight.setPosition(BLUE_POSITION);
 
-        // Store the current time to track when color was last seen
         lastColorTime = System.currentTimeMillis();
 
         // Wait for the game to start
         waitForStart();
 
-        while (opModeIsActive()) {
-            // Get the color detected by the sensor
-            red = colorSensor.red();
-            green = colorSensor.green();
-            blue = colorSensor.blue();
+        // Read color values
+        red = colorSensor.red();
+        green = colorSensor.green();
+        blue = colorSensor.blue();
 
-            // Check if it's time to reset to blue based on the timeout
-            if (System.currentTimeMillis() - lastColorTime > TIMEOUT) {
-                // If no green or purple detected for 10 seconds, reset to blue
-                lastColorPosition = BLUE_POSITION;
-                beaconLight.setPosition(BLUE_POSITION);
-            }
+        boolean colorDetected = false;
 
-            // Check if the detected color is closer to green
-            if (isGreen(red, green, blue)) {
-                // Only change to green if it's not already green
-                if (lastColorPosition != GREEN_POSITION) {
-                    lastColorPosition = GREEN_POSITION;
-                    beaconLight.setPosition(GREEN_POSITION);
-                    lastColorTime = System.currentTimeMillis();  // Update the last color seen time
-                }
-            }
-            // Check if the detected color is closer to purple
-            else if (isPurple(red, green, blue)) {
-                // Only change to purple if it's not already purple
-                if (lastColorPosition != PURPLE_POSITION) {
-                    lastColorPosition = PURPLE_POSITION;
-                    beaconLight.setPosition(PURPLE_POSITION);
-                    lastColorTime = System.currentTimeMillis();  // Update the last color seen time
-                }
-            }
-
-            // Add a small delay to make the program responsive
-            sleep(50);
+        // Detect colors
+        if (isGreen(red, green, blue)) {
+            setLEDs(GREEN_POS);
+            lastSeenTime = System.currentTimeMillis();
+            colorDetected = true;
+            telemetry.addLine("Detected: Green");
+        } else if (isPurple(red, green, blue)) {
+            setLEDs(PURPLE_POS);
+            lastSeenTime = System.currentTimeMillis();
+            colorDetected = true;
+            telemetry.addLine("Detected: Purple");
         }
+
+        // If no color detected for 3 seconds, turn blue
+        if (!colorDetected && System.currentTimeMillis() - lastSeenTime > 3000) {
+            setLEDs(BLUE_POS);
+            telemetry.addLine("No color detected for 3s → Blue");
+        }
+
+        telemetry.addData("Red", red);
+        telemetry.addData("Green", green);
+        telemetry.addData("Blue", blue);
+        telemetry.update();
+
+        sleep(50);
+
     }
 
-    // Helper method to check if the detected color is closer to green
+    // Helper: set both LEDs to same position
+    private void setLEDs(double position) {
+        leftLED.setPosition(position);
+        rightLED.setPosition(position);
+    }
+
+    // Helper: detect green
     private boolean isGreen(double red, double green, double blue) {
-        return green > red && green > blue;
+        return green > red * 1.3 && green > blue * 1.3 && green > 50;  // add small threshold
     }
 
-    // Helper method to check if the detected color is closer to purple
+    // Helper: detect purple (mix of red + blue, low green)
     private boolean isPurple(double red, double green, double blue) {
-        return red > blue && red > green;
+        return red > 60 && blue > 60 && green < (red + blue) / 3;
     }
 }
