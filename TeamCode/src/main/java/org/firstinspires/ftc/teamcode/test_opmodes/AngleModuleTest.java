@@ -20,6 +20,7 @@ public class AngleModuleTest extends OpMode {
     private FieldPositionEstimation field_estimator;
     private GoBildaPinpointDriver pinpoint;
     private AngleModule angleController;
+    private double desired_angle;
 
     @Override
     public void init() {
@@ -52,16 +53,21 @@ public class AngleModuleTest extends OpMode {
     public void loop() {
         if(gamepad1.a){
             field_estimator.reset_pinpoint();
+            desired_angle = 0;
         }
         field_estimator.update_from_pinpoint();
 
-        double turn;
+        double turn = 0;
+        desired_angle = desired_angle + gamepad1.right_stick_x * 1.4;
+
+        if(desired_angle > 180){
+            desired_angle = desired_angle- 360;
+        } else if (desired_angle <-180) {
+            desired_angle = desired_angle + 360;
+        }
 
         if (gamepad1.b){
-            turn = angleController.set_Angle(90, field_estimator.relative_robot_position.getHeading(AngleUnit.DEGREES));
-            turn = 0;
-        } else {
-            turn = gamepad1.right_stick_x * 0.6; // Rotate in place
+            turn = -angleController.set_Angle(desired_angle, field_estimator.relative_robot_position.getHeading(AngleUnit.DEGREES));
         }
 
         double y = -gamepad1.left_stick_y * 0.6;   // Forward/backward
@@ -92,8 +98,10 @@ public class AngleModuleTest extends OpMode {
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+        telemetry.addData("Desired Angle", desired_angle);
         telemetry.addData("Error", angleController.pid_controller.error);
         telemetry.addData("Rotation", "%f.2", field_estimator.relative_robot_position.getHeading(AngleUnit.DEGREES));
+        angleController.pid_controller.add_telemetry(telemetry);
         telemetry.update();
     }}
 

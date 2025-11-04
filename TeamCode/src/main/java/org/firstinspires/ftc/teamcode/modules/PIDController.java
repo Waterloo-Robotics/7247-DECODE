@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.modules;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class PIDController {
     public double target;
     public double current;
     public double error;
+    public double output;
     private double last_error;
 
     /* PID Constants */
@@ -23,6 +26,8 @@ public class PIDController {
     private double max_input = 1;
     private double min_input = -1;
     private boolean continuous_input = false;
+    private double max_acceleration = 0;
+    private boolean use_max_acceleration = false;
 
     /* Locals */
     private boolean limited;
@@ -56,7 +61,7 @@ public class PIDController {
         this.pTerm = this.error * this.kP;
 
         /* Only add to the integrator if we're not saturated */
-        if (!this.limited && Math.signum(this.iTerm) == Math.signum(this.error)) {
+        if (!this.limited && Math.abs(this.error) < 10) {
             this.iTerm = iTerm + (this.error * this.kI);
         }
 
@@ -77,7 +82,16 @@ public class PIDController {
             bound_output = raw_output;
         }
 
-        return bound_output;
+        /* Limit the acceleration */
+        if (this.use_max_acceleration && (Math.abs(bound_output) > Math.abs(this.output)) && (Math.abs(bound_output - this.output) > this.max_acceleration))
+        {
+            this.output = this.output + (this.max_acceleration * Math.signum(bound_output - this.output));
+        }
+        else{
+            this.output = bound_output;
+        }
+
+        return this.output;
     }
 
     public boolean at_target() {
@@ -93,6 +107,18 @@ public class PIDController {
         this.min_input = min;
         this.max_input = max;
         this.continuous_input = continuous;
+    }
+
+    public void set_acceleration_limit(double limit) {
+        this.max_acceleration = limit;
+        this.use_max_acceleration = true;
+    }
+
+    public void add_telemetry(Telemetry telemetry)
+    {
+        telemetry.addData("P Term", this.pTerm);
+        telemetry.addData("I Term", this.iTerm);
+        telemetry.addData("D Term", this.dTerm);
     }
 
 }
