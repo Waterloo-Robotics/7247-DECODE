@@ -44,7 +44,7 @@ public class PIDController {
         this.pTerm = this.error * this.kP;
 
         /* Only add to the integrator if we're not saturated */
-        if (!this.limited && Math.signum(this.iTerm) == Math.Signum(this.error)) {
+        if (!this.limited && Math.signum(this.iTerm) == Math.signum(this.error)) {
             this.iTerm = iTerm + (this.error * this.kI);
         }
 
