@@ -141,6 +141,13 @@ public class TeleOp_H2OLooBots extends OpMode {
             case REVERSE: intake.setPower(-1.0); break;
         }
 
+        // Make transfer follow intake direction
+        switch (intakeState) {
+            case OFF: transfer.setPower(0.0); break;
+            case INTAKE: transfer.setPower(1.0); break;
+            case REVERSE: transfer.setPower(-1.0); break;
+        }
+
         previousRightBumper = gamepad1.right_bumper;
 
         /* ---------------- TRANSFER MOTOR CONTROL ---------------- */
@@ -227,6 +234,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.update();
     }
+
     // helper stuff for color detection
     private void setLEDs(double position) {
         leftLED.setPosition(position);
