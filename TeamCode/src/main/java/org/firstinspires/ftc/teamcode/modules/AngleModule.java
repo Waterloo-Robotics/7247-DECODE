@@ -8,7 +8,8 @@ public class AngleModule {
 
     public AngleModule()
     {
-        this.pid_controller = new PIDController((float) 0.002, 0, 0);
+        this.pid_controller = new PIDController((float) 0.0065, 0, 0);
+        this.pid_controller.set_input_limits(-180, 180, true);
     }
 
     public double set_Angle( double angle, double current_angle)

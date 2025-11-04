@@ -20,6 +20,9 @@ public class PIDController {
     private double tolerance;
     private double max_output = 1;
     private double min_output = -1;
+    private double max_input = 1;
+    private double min_input = -1;
+    private boolean continuous_input = false;
 
     /* Locals */
     private boolean limited;
@@ -39,7 +42,16 @@ public class PIDController {
     }
 
     public double update(double current_position) {
-        this.error = this.target - current_position;
+        if (this.continuous_input) {
+            /* Target is -10 and we're at 180 = -190, we want 170 */
+            this.error = this.target - current_position;
+
+            if (this.error < this.min_input) {this.error = this.error + (this.max_input - this.min_input);}
+            if (this.error > this.max_input) {this.error = this.error - (this.max_input - this.min_input);}
+        }
+        else {
+            this.error = this.target - current_position;
+        }
 
         this.pTerm = this.error * this.kP;
 
@@ -75,6 +87,12 @@ public class PIDController {
     public void set_output_limits(double min, double max) {
         this.min_output = min;
         this.max_output = max;
+    }
+
+    public void set_input_limits(double min, double max, boolean continuous) {
+        this.min_input = min;
+        this.max_input = max;
+        this.continuous_input = continuous;
     }
 
 }
