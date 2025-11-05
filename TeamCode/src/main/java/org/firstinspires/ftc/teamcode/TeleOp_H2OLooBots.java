@@ -224,6 +224,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Intake Power", intake.getPower());
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addData("Transfer Power", transfer.getPower());
         telemetry.update();
     }
 
