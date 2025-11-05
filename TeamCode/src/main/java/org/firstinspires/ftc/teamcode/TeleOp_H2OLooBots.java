@@ -42,7 +42,6 @@ public class TeleOp_H2OLooBots extends OpMode {
     private enum IntakeState { OFF, INTAKE, REVERSE }
     private IntakeState intakeState = IntakeState.OFF;
 
-    private boolean previousRightBumper = false;
     private static final double GREEN_POS = 0.5;
     private static final double BLUE_POS = 0.611;
     private static final double PURPLE_POS = 0.772;
@@ -69,8 +68,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
-        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        transfer.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Modules
@@ -122,9 +121,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
         /* ---------------- INTAKE CONTROL ---------------- */
-        boolean rightPressed = gamepad1.right_bumper && !previousRightBumper;
-
-        if (rightPressed) {
+        if (gamepad1.rightBumperWasPressed()) {
             intakeState = (intakeState == IntakeState.INTAKE) ? IntakeState.OFF : IntakeState.INTAKE;
         }
 
@@ -150,10 +147,6 @@ public class TeleOp_H2OLooBots extends OpMode {
                 transfer.setPower(-1.0); // reverse with intake
                 break;
         }
-
-
-
-        previousRightBumper = gamepad1.right_bumper;
 
         /* ---------------- TRANSFER MOTOR CONTROL ---------------- */
 
