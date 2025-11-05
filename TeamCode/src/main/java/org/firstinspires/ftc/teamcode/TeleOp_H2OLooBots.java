@@ -38,12 +38,10 @@ public class TeleOp_H2OLooBots extends OpMode {
     private double hoodPosition = 0.4; // start in mid position
     private double flywheelRPM;
 
-    // Transfer motor state
-    private boolean transferActive = false; // Variable to track the state of the transfer motor
-
     // Intake state management
     private enum IntakeState { OFF, INTAKE, REVERSE }
     private IntakeState intakeState = IntakeState.OFF;
+
     private boolean previousRightBumper = false;
     private static final double GREEN_POS = 0.5;
     private static final double BLUE_POS = 0.611;
@@ -72,6 +70,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         // Modules
         flywheelControl = new flywheelModule(flywheel);
@@ -130,33 +130,33 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         if (gamepad1.left_bumper) {
             intakeState = IntakeState.REVERSE;
+
         } else if (intakeState == IntakeState.REVERSE) {
             intakeState = IntakeState.INTAKE;
         }
 
         // Apply motor power for intake
         switch (intakeState) {
-            case OFF: intake.setPower(0.0); break;
-            case INTAKE: intake.setPower(1.0); break;
-            case REVERSE: intake.setPower(-1.0); break;
+            case OFF:
+                intake.setPower(0.0);
+                transfer.setPower(0.0);
+                break;
+            case INTAKE:
+                intake.setPower(1.0);
+                transfer.setPower(1.0); // forward with intake
+                break;
+            case REVERSE:
+                intake.setPower(-1.0);
+                transfer.setPower(-1.0); // reverse with intake
+                break;
         }
 
-        // Make transfer follow intake direction
-        switch (intakeState) {
-            case OFF: transfer.setPower(0.0); break;
-            case INTAKE: transfer.setPower(1.0); break;
-            case REVERSE: transfer.setPower(-1.0); break;
-        }
+
 
         previousRightBumper = gamepad1.right_bumper;
 
         /* ---------------- TRANSFER MOTOR CONTROL ---------------- */
-        if (gamepad1.a) {
-            transferActive = !transferActive; // Toggle transfer motor state on X button press
-        }
 
-        // Run transfer motor at full power if active, otherwise stop it
-        transfer.setPower(transferActive ? 1.0 : 0.0);
 
         /* ---------------- HOOD CONTROL ---------------- */
         if (gamepad1.dpad_up) {
@@ -225,7 +225,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         /* ---------------- GENERAL TELEMETRY ---------------- */
         telemetry.addData("Flywheel RPM", flywheelRPM);
         telemetry.addData("Hood Position", hoodPosition);
-        telemetry.addData("Transfer Active", transferActive ? "ON" : "OFF"); // Display transfer motor status
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
