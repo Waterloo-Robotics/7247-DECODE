@@ -40,6 +40,10 @@ public class TeleOp_H2OLooBots extends OpMode {
     private enum IntakeState { OFF, INTAKE, REVERSE }
     private IntakeState intakeState = IntakeState.OFF;
 
+    // Transfer control
+    private boolean transferForward = false;   // forward toggle state
+    private boolean forwardPressedLast = false; // for edge detection
+
     @Override
     public void init() {
         /* ----- Hardware Map ----- */
@@ -66,7 +70,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelControl = new flywheelModule(flywheel);
         flywheelRPM = 0;
 
-
         llModule = new LimelightProcessingModule(limelight, telemetry);
 
         telemetry.addData("Status", "Initialized");
@@ -79,8 +82,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         double x = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
-
-        // color sensor doesnt seem to be working well, so we will keep it purple for now
+        // keep LEDs purple
         leftLED.setPosition(0.722);
         rightLED.setPosition(0.722);
 
@@ -112,10 +114,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
 
-        /* ---------------- INTAKE + TRANSFER CONTROL ---------------- */
+        /* ---------------- INTAKE CONTROL ---------------- */
         double intakePower = 0.0;
-        double transferPower = 0.0;
-
 
         // Toggle intake on/off with right bumper
         if (gamepad2.right_bumper) {
@@ -146,12 +146,38 @@ public class TeleOp_H2OLooBots extends OpMode {
                 break;
         }
 
-        // Apply motor power
         intake.setPower(intakePower);
+
+        /* ---------------- TRANSFER CONTROL ---------------- */
+        double transferPower = 0.0;
+
+        boolean forwardPressed = gamepad2.b; // toggle forward
+        boolean reverseHeld = gamepad2.x;    // hold to reverse
+
+        // Toggle transfer forward mode on rising edge of B
+        if (!forwardPressedLast && forwardPressed) {
+            transferForward = !transferForward;
+        }
+
+        // Reverse overrides forward toggle while held
+        if (reverseHeld) {
+            transferPower = -1.0;
+        } else if (transferForward) {
+            transferPower = 1.0;
+        } else {
+            transferPower = 0.0;
+        }
+
+        // save last state for edge detection
+        forwardPressedLast = forwardPressed;
+
+        // Apply motor power
         transfer.setPower(transferPower);
 
         telemetry.addData("Intake State", intakeState);
         telemetry.addData("Intake Power", intakePower);
+        telemetry.addData("Transfer Forward", transferForward);
+        telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
         if (gamepad2.dpad_up) {
