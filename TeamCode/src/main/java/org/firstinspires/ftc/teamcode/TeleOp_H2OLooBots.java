@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -29,7 +29,6 @@ public class TeleOp_H2OLooBots extends OpMode {
     private flywheelModule flywheelControl;
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
-    private ColorSensor colorSensor;
     private Servo leftLED;
     private Servo rightLED;
 
@@ -40,11 +39,6 @@ public class TeleOp_H2OLooBots extends OpMode {
     // Intake state management
     private enum IntakeState { OFF, INTAKE, REVERSE }
     private IntakeState intakeState = IntakeState.OFF;
-
-    private static final double GREEN_POS = 0.5;
-    private static final double BLUE_POS = 0.611;
-    private static final double PURPLE_POS = 0.772;
-    private long lastSeenTime = 0;
 
     @Override
     public void init() {
@@ -58,7 +52,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
-        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
         leftLED = hardwareMap.get(Servo.class, "leftLED");
         rightLED = hardwareMap.get(Servo.class, "rightLED");
 
@@ -73,21 +66,23 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelControl = new flywheelModule(flywheel);
         flywheelRPM = 0;
 
-        llModule = new LimelightProcessingModule(limelight, telemetry);
 
-        setLEDs(BLUE_POS);
-        lastSeenTime = System.currentTimeMillis();
+        llModule = new LimelightProcessingModule(limelight, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
 
-    @Override
     public void loop() {
         /* ---------------- DRIVE CODE ---------------- */
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
+
+
+        // color sensor doesnt seem to be working well, so we will keep it purple for now
+        leftLED.setPosition(0.722);
+        rightLED.setPosition(0.722);
 
         double frontLeftPower = y + x + turn;
         double frontRightPower = y - x - turn;
@@ -109,10 +104,10 @@ public class TeleOp_H2OLooBots extends OpMode {
         backRight.setPower(backRightPower);
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad1.right_trigger * 50;
-        flywheelRPM -= gamepad1.left_trigger * 50;
+        flywheelRPM += gamepad2.right_trigger * 50;
+        flywheelRPM -= gamepad2.left_trigger * 50;
 
-        if (gamepad1.y) flywheelRPM = 0;
+        if (gamepad2.y) flywheelRPM = 0;
 
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
@@ -123,7 +118,7 @@ public class TeleOp_H2OLooBots extends OpMode {
 
 
         // Toggle intake on/off with right bumper
-        if (gamepad1.right_bumper) {
+        if (gamepad2.right_bumper) {
             if (intakeState == IntakeState.INTAKE) {
                 intakeState = IntakeState.OFF;
             } else {
@@ -132,9 +127,9 @@ public class TeleOp_H2OLooBots extends OpMode {
         }
 
         // Reverse intake while left bumper is held
-        if (gamepad1.left_bumper) {
+        if (gamepad2.left_bumper) {
             intakeState = IntakeState.REVERSE;
-        } else if (intakeState == IntakeState.REVERSE && !gamepad1.left_bumper) {
+        } else if (intakeState == IntakeState.REVERSE && !gamepad2.left_bumper) {
             intakeState = IntakeState.INTAKE;
         }
 
@@ -151,38 +146,33 @@ public class TeleOp_H2OLooBots extends OpMode {
                 break;
         }
 
-        // --- Sync transfer opposite to intake (due to mounting) ---
-        final double TRANSFER_DIRECTION_MULTIPLIER = -1.0;  // Opposite direction of intake
-        transferPower = intakePower * TRANSFER_DIRECTION_MULTIPLIER;
-
         // Apply motor power
         intake.setPower(intakePower);
         transfer.setPower(transferPower);
 
         telemetry.addData("Intake State", intakeState);
         telemetry.addData("Intake Power", intakePower);
-        telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
-        if (gamepad1.dpad_up) {
+        if (gamepad2.dpad_up) {
             hoodPosition += 0.005;
-        } else if (gamepad1.dpad_down) {
+        } else if (gamepad2.dpad_down) {
             hoodPosition -= 0.005;
         }
 
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        if (gamepad1.dpad_left) {
+        if (gamepad2.dpad_left) {
             hoodPosition = 0.417;
             flywheelRPM = 3500;
         }
 
-        if (gamepad1.dpad_right) {
+        if (gamepad2.dpad_right) {
             hoodPosition = 0.25;
             flywheelRPM = 2500;
         }
 
-        if (gamepad1.a) flywheelRPM = 0;
+        if (gamepad2.a) flywheelRPM = 0;
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
@@ -198,34 +188,6 @@ public class TeleOp_H2OLooBots extends OpMode {
             telemetry.addData("Limelight", "No valid target");
         }
 
-        // COLOR SENSING + LED CONTROL
-        double red = colorSensor.red();
-        double green = colorSensor.green();
-        double blue = colorSensor.blue();
-
-        boolean colorDetected = false;
-
-        if (isGreen(red, green, blue)) {
-            setLEDs(GREEN_POS);
-            lastSeenTime = System.currentTimeMillis();
-            colorDetected = true;
-            telemetry.addLine("Detected: Green");
-        } else if (isPurple(red, green, blue)) {
-            setLEDs(PURPLE_POS);
-            lastSeenTime = System.currentTimeMillis();
-            colorDetected = true;
-            telemetry.addLine("Detected: Purple");
-        }
-
-        if (!colorDetected && System.currentTimeMillis() - lastSeenTime > 3000) {
-            setLEDs(BLUE_POS);
-            telemetry.addLine("No color detected for 3s → Blue");
-        }
-
-        telemetry.addData("Color - Red", red);
-        telemetry.addData("Color - Green", green);
-        telemetry.addData("Color - Blue", blue);
-
         /* ---------------- GENERAL TELEMETRY ---------------- */
         telemetry.addData("Flywheel RPM", flywheelRPM);
         telemetry.addData("Hood Position", hoodPosition);
@@ -235,19 +197,5 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.update();
-    }
-
-    // helper stuff for color detection
-    private void setLEDs(double position) {
-        leftLED.setPosition(position);
-        rightLED.setPosition(position);
-    }
-
-    private boolean isGreen(double red, double green, double blue) {
-        return green > red * 1.3 && green > blue * 1.3 && green > 50;
-    }
-
-    private boolean isPurple(double red, double green, double blue) {
-        return red > 60 && blue > 60 && green < (red + blue) / 3;
     }
 }
