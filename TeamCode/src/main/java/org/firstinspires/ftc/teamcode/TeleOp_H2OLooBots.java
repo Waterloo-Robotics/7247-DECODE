@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -71,7 +70,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         transfer.setDirection(DcMotor.Direction.REVERSE);
 
-
         // Modules
         flywheelControl = new flywheelModule(flywheel);
         flywheelRPM = 0;
@@ -120,36 +118,51 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
 
-        /* ---------------- INTAKE CONTROL ---------------- */
-        if (gamepad1.rightBumperWasPressed()) {
-            intakeState = (intakeState == IntakeState.INTAKE) ? IntakeState.OFF : IntakeState.INTAKE;
+        /* ---------------- INTAKE + TRANSFER CONTROL ---------------- */
+        double intakePower = 0.0;
+        double transferPower = 0.0;
+
+        // Toggle intake on/off with right bumper
+        if (gamepad1.right_bumper) {
+            if (intakeState == IntakeState.INTAKE) {
+                intakeState = IntakeState.OFF;
+            } else {
+                intakeState = IntakeState.INTAKE;
+            }
         }
 
+        // Reverse intake while left bumper is held
         if (gamepad1.left_bumper) {
             intakeState = IntakeState.REVERSE;
-
-        } else if (intakeState == IntakeState.REVERSE) {
+        } else if (intakeState == IntakeState.REVERSE && !gamepad1.left_bumper) {
             intakeState = IntakeState.INTAKE;
         }
 
-        // Apply motor power for intake
+        // Determine motor powers based on intake state
         switch (intakeState) {
             case OFF:
-                intake.setPower(0.0);
-                transfer.setPower(0.0);
+                intakePower = 0.0;
                 break;
             case INTAKE:
-                intake.setPower(1.0);
-                transfer.setPower(1.0); // forward with intake
+                intakePower = 1.0;
                 break;
             case REVERSE:
-                intake.setPower(-1.0);
-                transfer.setPower(-1.0); // reverse with intake
+                intakePower = -1.0;
                 break;
         }
 
-        /* ---------------- TRANSFER MOTOR CONTROL ---------------- */
+        // --- Sync transfer with intake physical direction ---
+        // If transfer spins the wrong way, flip the sign below:
+        final double TRANSFER_DIRECTION_MULTIPLIER = -1.0;  // Change to +1.0 if needed
+        transferPower = intakePower * TRANSFER_DIRECTION_MULTIPLIER;
 
+        // Apply motor power
+        intake.setPower(intakePower);
+        transfer.setPower(transferPower);
+
+        telemetry.addData("Intake State", intakeState);
+        telemetry.addData("Intake Power", intakePower);
+        telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
         if (gamepad1.dpad_up) {
@@ -186,7 +199,6 @@ public class TeleOp_H2OLooBots extends OpMode {
             telemetry.addData("Limelight", "No valid target");
         }
 
-
         // COLOR SENSING + LED CONTROL
         double red = colorSensor.red();
         double green = colorSensor.green();
@@ -222,9 +234,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Motor Speed", flywheelControl.motor_speed_rpm);
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
-        telemetry.addData("Intake Power", intake.getPower());
         telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addData("Transfer Power", transfer.getPower());
         telemetry.update();
     }
 
