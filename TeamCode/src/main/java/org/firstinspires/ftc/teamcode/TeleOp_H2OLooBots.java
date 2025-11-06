@@ -55,7 +55,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        transfer = hardwareMap.get(DcMotor.class, "transfer"); // Initialize transfer motor
+        transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
@@ -68,7 +68,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
-        transfer.setDirection(DcMotor.Direction.REVERSE);
 
         // Modules
         flywheelControl = new flywheelModule(flywheel);
@@ -122,6 +121,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         double intakePower = 0.0;
         double transferPower = 0.0;
 
+
         // Toggle intake on/off with right bumper
         if (gamepad1.right_bumper) {
             if (intakeState == IntakeState.INTAKE) {
@@ -151,9 +151,8 @@ public class TeleOp_H2OLooBots extends OpMode {
                 break;
         }
 
-        // --- Sync transfer with intake physical direction ---
-        // If transfer spins the wrong way, flip the sign below:
-        final double TRANSFER_DIRECTION_MULTIPLIER = -1.0;  // Change to +1.0 if needed
+        // --- Sync transfer opposite to intake (due to mounting) ---
+        final double TRANSFER_DIRECTION_MULTIPLIER = -1.0;  // Opposite direction of intake
         transferPower = intakePower * TRANSFER_DIRECTION_MULTIPLIER;
 
         // Apply motor power
