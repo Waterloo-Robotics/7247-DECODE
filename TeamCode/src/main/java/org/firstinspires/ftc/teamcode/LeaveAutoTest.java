@@ -4,14 +4,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Leave Auto", group="Linear OpMode")
+@Autonomous(name="Leave Auto", group="Auto")
 public class LeaveAutoTest extends LinearOpMode {
-    private DcMotor backLeft;
-    private DcMotor backRight;
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
+    private DcMotor backLeft = null;
+    private DcMotor backRight = null;
+    private DcMotor frontLeft = null;
+    private DcMotor frontRight = null;
     private ElapsedTime runtime = new ElapsedTime();
 
     static final double FORWARD_POWER = 0.5; /*power sent to the motors,
@@ -25,19 +26,17 @@ public class LeaveAutoTest extends LinearOpMode {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
 
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
-        if (opModeIsActive()) {
+        while (opModeIsActive() && runtime.milliseconds() < DRIVE_TIME_MS) {
             frontLeft.setPower(FORWARD_POWER);
             frontRight.setPower(FORWARD_POWER);
             backLeft.setPower(FORWARD_POWER);
             backRight.setPower(FORWARD_POWER);
-        }
-        while (opModeIsActive() && runtime.milliseconds() < DRIVE_TIME_MS) {
             telemetry.addLine("Driving");
             telemetry.update();
         }

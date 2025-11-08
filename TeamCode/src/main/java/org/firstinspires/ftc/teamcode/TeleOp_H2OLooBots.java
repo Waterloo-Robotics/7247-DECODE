@@ -103,6 +103,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         if (gamepad2.touchpad || gamepad1.touchpad) {
             intakePower = -1.0;      // reverse
             transferPower = 1.0;    // reverse
+            flywheelRPM = 3500;
         }
 
         // --- Ball 1 (B) ---
@@ -146,12 +147,12 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         if (gamepad2.dpad_left) {
             hoodPosition = 0.725;
-            flywheelRPM = 3600;
+            flywheelRPM = 3500;
         }
 
         if (gamepad2.dpad_right) {
             hoodPosition = 0.575;
-            flywheelRPM = 3900;
+            flywheelRPM = 3750;
         }
 
         hood.setPosition(hoodPosition);
@@ -176,6 +177,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
+        telemetry.addLine("Left = Short | Right = Far");
         telemetry.update();
     }
 }
