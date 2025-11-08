@@ -36,14 +36,6 @@ public class TeleOp_H2OLooBots extends OpMode {
     private double hoodPosition = 0.4; // start in mid position
     private double flywheelRPM;
 
-    // Intake state management
-    private enum IntakeState { OFF, INTAKE, REVERSE }
-    private IntakeState intakeState = IntakeState.OFF;
-
-    // Transfer control
-    private boolean transferForward = false;   // forward toggle state
-    private boolean forwardPressedLast = false; // for edge detection
-
     @Override
     public void init() {
         /* ----- Hardware Map ----- */
@@ -109,74 +101,54 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM += gamepad2.right_trigger * 50;
         flywheelRPM -= gamepad2.left_trigger * 50;
 
-        if (gamepad2.y) flywheelRPM = 0;
-
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
 
-        /* ---------------- INTAKE CONTROL ---------------- */
+        /* ---------------- BALL / INTAKE / TRANSFER CONTROL ---------------- */
         double intakePower = 0.0;
-
-        // Toggle intake on/off with right bumper
-        if (gamepad2.right_bumper) {
-            if (intakeState == IntakeState.INTAKE) {
-                intakeState = IntakeState.OFF;
-            } else {
-                intakeState = IntakeState.INTAKE;
-            }
-        }
-
-        // Reverse intake while left bumper is held
-        if (gamepad2.left_bumper) {
-            intakeState = IntakeState.REVERSE;
-        } else if (intakeState == IntakeState.REVERSE && !gamepad2.left_bumper) {
-            intakeState = IntakeState.INTAKE;
-        }
-
-        // Determine motor powers based on intake state
-        switch (intakeState) {
-            case OFF:
-                intakePower = 0.0;
-                break;
-            case INTAKE:
-                intakePower = 1.0;
-                break;
-            case REVERSE:
-                intakePower = -1.0;
-                break;
-        }
-
-        intake.setPower(intakePower);
-
-        /* ---------------- TRANSFER CONTROL ---------------- */
         double transferPower = 0.0;
 
-        boolean forwardPressed = gamepad2.b; // toggle forward
-        boolean reverseHeld = gamepad2.x;    // hold to reverse
-
-        // Toggle transfer forward mode on rising edge of B
-        if (!forwardPressedLast && forwardPressed) {
-            transferForward = !transferForward;
+        // --- Touchpad reverses both while held ---
+        if (gamepad2.touchpad) {
+            intakePower = 1.0;      // reverse
+            transferPower = 1.0;    // reverse
         }
 
-        // Reverse overrides forward toggle while held
-        if (reverseHeld) {
-            transferPower = -1.0;
-        } else if (transferForward) {
-            transferPower = 1.0;
-        } else {
+        // --- Ball 1 (B) ---
+        else if (gamepad2.b) {
+            intakePower = -1.0;     // forward
+            transferPower = -1.0;   // forward
+        }
+
+        // --- Ball 2 (X) ---
+        else if (gamepad2.x) {
+            intakePower = 0.0;      // off
+            transferPower = -1.0;   // forward
+        }
+
+        // --- Launch (Y) ---
+        else if (gamepad2.y) {
+            intakePower = -1.0;     // forward
+            transferPower = -1.0;   // forward
+        }
+
+        // --- Default: stop both ---
+        else {
+            intakePower = 0.0;
             transferPower = 0.0;
         }
 
-        // save last state for edge detection
-        forwardPressedLast = forwardPressed;
+        // --- Flywheel Stop (A) ---
+        if (gamepad2.a) {
+            flywheelRPM = 0;
+        }
 
-        // Apply motor power
+        // Apply powers
+        intake.setPower(intakePower);
         transfer.setPower(transferPower);
+        flywheelControl.set_speed((int) flywheelRPM);
 
-        telemetry.addData("Intake State", intakeState);
         telemetry.addData("Intake Power", intakePower);
-        telemetry.addData("Transfer Forward", transferForward);
         telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
@@ -197,8 +169,6 @@ public class TeleOp_H2OLooBots extends OpMode {
             hoodPosition = 0.25;
             flywheelRPM = 2500;
         }
-
-        if (gamepad2.a) flywheelRPM = 0;
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
