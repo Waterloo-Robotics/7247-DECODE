@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -161,9 +159,9 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         // Reverse overrides forward toggle while held
         if (reverseHeld) {
-            transferPower = -1.0;
-        } else if (transferForward) {
             transferPower = 1.0;
+        } else if (transferForward) {
+            transferPower = -1.0;
         } else {
             transferPower = 0.0;
         }
