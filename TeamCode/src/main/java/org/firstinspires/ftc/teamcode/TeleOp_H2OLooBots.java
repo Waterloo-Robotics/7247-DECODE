@@ -27,8 +27,6 @@ public class TeleOp_H2OLooBots extends OpMode {
     private flywheelModule flywheelControl;
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
-    private Servo leftLED;
-    private Servo rightLED;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 0.4; // start in mid position
@@ -46,8 +44,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
-        leftLED = hardwareMap.get(Servo.class, "leftLED");
-        rightLED = hardwareMap.get(Servo.class, "rightLED");
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -72,9 +68,6 @@ public class TeleOp_H2OLooBots extends OpMode {
         double x = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
-        // keep LEDs purple
-        leftLED.setPosition(0.722);
-        rightLED.setPosition(0.722);
 
         double frontLeftPower = y + x + turn;
         double frontRightPower = y - x - turn;
@@ -144,21 +137,21 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         /* ---------------- HOOD CONTROL ---------------- */
         if (gamepad2.dpad_up) {
-            hoodPosition += 0.005;
-        } else if (gamepad2.dpad_down) {
             hoodPosition -= 0.005;
+        } else if (gamepad2.dpad_down) {
+            hoodPosition += 0.005;
         }
 
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if (gamepad2.dpad_left) {
-            hoodPosition = 0.417;
-            flywheelRPM = 3500;
+            hoodPosition = 0.725;
+            flywheelRPM = 3600;
         }
 
         if (gamepad2.dpad_right) {
-            hoodPosition = 0.25;
-            flywheelRPM = 2500;
+            hoodPosition = 0.575;
+            flywheelRPM = 3900;
         }
 
         hood.setPosition(hoodPosition);
