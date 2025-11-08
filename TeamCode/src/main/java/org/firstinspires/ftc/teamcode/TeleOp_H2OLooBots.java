@@ -109,27 +109,20 @@ public class TeleOp_H2OLooBots extends OpMode {
         double transferPower = 0.0;
 
         // --- Touchpad reverses both while held ---
-        if (gamepad2.touchpad) {
-            intakePower = 1.0;      // reverse
+        if (gamepad2.touchpad || gamepad1.touchpad) {
+            intakePower = -1.0;      // reverse
             transferPower = 1.0;    // reverse
         }
 
         // --- Ball 1 (B) ---
-        else if (gamepad2.b) {
-            intakePower = -1.0;     // forward
+        else if (gamepad2.b || gamepad1.b) {
+            intakePower = 1.0;     // forward
             transferPower = -1.0;   // forward
         }
 
         // --- Ball 2 (X) ---
-        else if (gamepad2.x) {
-            intakePower = 0.0;      // off
-            transferPower = -1.0;   // forward
-        }
-
-        // --- Launch (Y) ---
-        else if (gamepad2.y) {
-            intakePower = -1.0;     // forward
-            transferPower = -1.0;   // forward
+        else if (gamepad2.x || gamepad1.x) {
+            intakePower = 1.0;      // forward
         }
 
         // --- Default: stop both ---
