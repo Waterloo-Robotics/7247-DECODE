@@ -22,6 +22,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor intake;
     private DcMotor transfer;
     private Servo hood;
+    private Servo blocker;
 
     /* ---------- Modules & Sensors ---------- */
     private flywheelModule flywheelControl;
@@ -126,6 +127,12 @@ public class TeleOp_H2OLooBots extends OpMode {
         // --- Flywheel Stop (A) ---
         if (gamepad2.a) {
             flywheelRPM = 0;
+        }
+        if (flywheelRPM > 0) {
+            blocker.setPosition(1);
+        }
+        else {
+            blocker.setPosition(0);
         }
 
         // Apply powers
