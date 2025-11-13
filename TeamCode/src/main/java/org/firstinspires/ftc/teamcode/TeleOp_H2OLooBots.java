@@ -128,6 +128,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         if (gamepad2.a) {
             flywheelRPM = 0;
         }
+        
+        // --- Blocker to stop balls from getting stuck ---
         if (flywheelRPM > 0) {
             blocker.setPosition(1);
         }
