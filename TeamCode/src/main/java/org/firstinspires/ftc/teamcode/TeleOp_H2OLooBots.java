@@ -22,6 +22,8 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor intake;
     private DcMotor transfer;
     private Servo hood;
+    private Servo leftLED;
+    private Servo rightLED;
 
     /* ---------- Modules & Sensors ---------- */
     private flywheelModule flywheelControl;
@@ -31,6 +33,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     /* ---------- Variables ---------- */
     private double hoodPosition = 0.4; // start in mid position
     private double flywheelRPM;
+
 
     @Override
     public void init() {
@@ -44,6 +47,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
+        Servo leftLED = hardwareMap.get(Servo.class, "leftLED");
+        Servo rightLED = hardwareMap.get(Servo.class, "rightLED");
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -157,6 +162,18 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
+
+        /* -------- LED STUFF -------- */
+        if (flywheelRPM > 2500) {
+            leftLED.setPosition(0.500);
+            rightLED.setPosition(0.500);
+        }
+        else {
+            leftLED.setPosition(0.277);
+            rightLED.setPosition(0.277);
+        }
+
+
 
         /* ---------------- LIMELIGHT TELEMETRY ---------------- */
         Pose2D pose = llModule.limelightResult();
