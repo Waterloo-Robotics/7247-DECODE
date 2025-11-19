@@ -30,7 +30,7 @@ public class AutoShooterTest extends OpMode {
 
     private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125};
     private float[] flywheel_speed = {2550, 2800, 2900, 3000, 3050, 3170, 3200, 3150, 3250, 3650};
-    private float[] hood_angle = { 3/4, 3/4, 2, 3, 4};
+    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
 
@@ -66,8 +66,20 @@ public class AutoShooterTest extends OpMode {
     }
 
     public void loop() {
-        float rpm = flywheel_speed_table.Lookup(limeight_distance);
-        float angle = hood_angle_table.Lookup(limelight_distance);
+        float rpm = 0;
+        float angle = 0;
+
+        Pose2D pose = llModule.limelightResult();
+
+        if (pose != null)
+        {
+            float limelight_distance = (float)pose.getX(DistanceUnit.INCH);
+
+            rpm = flywheel_speed_table.Lookup(limelight_distance);
+            angle = hood_angle_table.Lookup(limelight_distance);
+        }
+
+
 
 
 
@@ -98,9 +110,9 @@ public class AutoShooterTest extends OpMode {
         backRight.setPower(backRightPower);
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad2.right_trigger * 50;
-        flywheelRPM -= gamepad2.left_trigger * 50;
-
+//        flywheelRPM += gamepad2.right_trigger * 50;
+//        flywheelRPM -= gamepad2.left_trigger * 50;
+        flywheelRPM = rpm;
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
 
@@ -151,7 +163,7 @@ public class AutoShooterTest extends OpMode {
         } else if (gamepad2.dpad_down) {
             hoodPosition += 0.005;
         }
-
+        hoodPosition = angle;
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if (gamepad2.dpad_left) {
@@ -167,8 +179,8 @@ public class AutoShooterTest extends OpMode {
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        /* ---------------- LIMELIGHT TELEMETRY ---------------- */
-        Pose2D pose = llModule.limelightResult();
+
+
 
         if (pose != null) {
             telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
