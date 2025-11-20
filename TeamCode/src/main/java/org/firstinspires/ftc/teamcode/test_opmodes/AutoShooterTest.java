@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.test_opmodes;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.sun.tools.javac.util.Name;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
+@TeleOp(name="AutoShoota", group="TestOpMode")
 public class AutoShooterTest extends OpMode {
     private flywheelModule flywheelControl;
     private Limelight3A limelight;
@@ -67,17 +69,23 @@ public class AutoShooterTest extends OpMode {
 
     public void loop() {
         float rpm = 0;
-        float angle = 0;
+        float angle = 1;
+        boolean limelight_available = false;
 
         Pose2D pose = llModule.limelightResult();
 
-        if (pose != null)
-        {
-            float limelight_distance = (float)pose.getX(DistanceUnit.INCH);
+        float limelight_distance = 0;
+        if (pose != null) {
+            limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
 
-            rpm = flywheel_speed_table.Lookup(limelight_distance);
+            if (limelight_distance < 81 || limelight_distance > 124) {
+                limelight_available = true;
+            }
+
+            rpm =  (flywheel_speed_table.Lookup(limelight_distance));
             angle = hood_angle_table.Lookup(limelight_distance);
         }
+
 
 
 
@@ -180,10 +188,8 @@ public class AutoShooterTest extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
 
-
-
         if (pose != null) {
-            telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
+            telemetry.addData("X (inches)",-pose.getX(DistanceUnit.INCH)*1.75);
             telemetry.addData("Y (inches)", pose.getY(DistanceUnit.INCH));
             telemetry.addData("Rotation (degrees)", pose.getHeading(AngleUnit.DEGREES));
         } else {
