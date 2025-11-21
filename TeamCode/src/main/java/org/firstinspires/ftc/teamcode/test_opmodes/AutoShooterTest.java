@@ -30,9 +30,9 @@ public class AutoShooterTest extends OpMode {
     private double flywheelRPM;
     private double hoodPosition;
 
-    private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125};
-    private float[] flywheel_speed = {2550, 2800, 2900, 3000, 3050, 3170, 3200, 3150, 3250, 3650};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55};
+    private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
+    private float[] flywheel_speed = {2550, 2800, 2900, 3000, 3050, 3170, 3200, 3150, 3250, 3650,3650};
+    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
 
