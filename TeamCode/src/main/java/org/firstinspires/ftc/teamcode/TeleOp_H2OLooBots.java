@@ -31,7 +31,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     private Servo rightLED;
 
     /* ---------- Variables ---------- */
-    private double hoodPosition = 0.4; // start in mid position
+    private double hoodPosition = 0.9; // start in mid position
     private double flywheelRPM;
 
     @Override
