@@ -1,9 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.test_opmodes;
+
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.sun.tools.javac.util.Name;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -11,10 +14,12 @@ import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
-@TeleOp(name="H2O Loo Bots Teleop", group="LinearOpMode")
-public class TeleOp_H2OLooBots extends OpMode {
-
-    /* ---------- Drive Motors ---------- */
+@TeleOp(name="AutoShoota", group="TestOpMode")
+public class AutoShooterTest extends OpMode {
+    private flywheelModule flywheelControl;
+    private Limelight3A limelight;
+    private LimelightProcessingModule llModule;
+    private Servo hood;
     private DcMotor backLeft;
     private DcMotor backRight;
     private DcMotor frontLeft;
@@ -22,22 +27,15 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor flywheel;
     private DcMotor intake;
     private DcMotor transfer;
-    private Servo hood;
-    float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
+    private double flywheelRPM;
+    private double hoodPosition;
+
+    private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
     private float[] flywheel_speed = {2650, 2900, 3000, 3100, 3150, 3270, 3300, 3250, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
-
-    /* ---------- Modules & Sensors ---------- */
-    private flywheelModule flywheelControl;
-    private Limelight3A limelight;
-    private LimelightProcessingModule llModule;
-
-    /* ---------- Variables ---------- */
-    private double hoodPosition = 0.4; // start in mid position
-    private double flywheelRPM;
 
     @Override
     public void init() {
@@ -65,6 +63,8 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
 
+
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -87,6 +87,11 @@ public class TeleOp_H2OLooBots extends OpMode {
             rpm =  (flywheel_speed_table.Lookup(limelight_distance));
             angle = hood_angle_table.Lookup(limelight_distance);
         }
+
+
+
+
+
 
 
         /* ---------------- DRIVE CODE ---------------- */
@@ -115,8 +120,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         backRight.setPower(backRightPower);
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad2.right_trigger * 50;
-        flywheelRPM -= gamepad2.left_trigger * 50;
+//        flywheelRPM += gamepad2.right_trigger * 50;
+//        flywheelRPM -= gamepad2.left_trigger * 50;
 
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
@@ -168,15 +173,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         } else if (gamepad2.dpad_down) {
             hoodPosition += 0.005;
         }
-        hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
-            AutoTargeting = !AutoTargeting;
-        }
-        if(AutoTargeting) {
-            flywheelRPM = rpm;
-            hoodPosition = angle;
-        }
+        hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if (gamepad2.dpad_left) {
             hoodPosition = 0.725;
@@ -191,11 +189,16 @@ public class TeleOp_H2OLooBots extends OpMode {
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        /* ---------------- LIMELIGHT TELEMETRY ---------------- */
-
+        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+            AutoTargeting = !AutoTargeting;
+        }
+        if(AutoTargeting == true){
+            flywheelRPM =rpm;
+            hoodPosition = angle;
+        }
 
         if (pose != null) {
-            telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
+            telemetry.addData("X (inches)",-pose.getX(DistanceUnit.INCH)*1.75);
             telemetry.addData("Y (inches)", pose.getY(DistanceUnit.INCH));
             telemetry.addData("Rotation (degrees)", pose.getHeading(AngleUnit.DEGREES));
         } else {
@@ -210,7 +213,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addLine("Left = Short | Right = Far");
         telemetry.update();
     }
 }
+
+
