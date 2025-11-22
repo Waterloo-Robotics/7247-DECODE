@@ -83,6 +83,20 @@ public class autoTest extends LinearOpMode {
 
             // Stop flywheel
             flywheel.setVelocity(0);
+
+            sleep(500);
+            frontLeft.setPower(-0.5);
+            frontRight.setPower(0.5);
+            backLeft.setPower(-0.5);
+            backRight.setPower(0.5);
+
+            sleep(500);
+            frontLeft.setPower(-1);
+            frontRight.setPower(-1);
+            backLeft.setPower(-1);
+            backRight.setPower(-1);
+            sleep(1000);
+
         }
     }
 }
