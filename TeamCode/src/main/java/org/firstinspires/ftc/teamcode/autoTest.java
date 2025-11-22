@@ -6,20 +6,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.modules.PIDController;
-
 @Autonomous(name = "autoTest", group = "Auto")
 public class autoTest extends LinearOpMode {
 
-    DcMotor backLeft, backRight, frontLeft, frontRight;
-    DcMotorEx flywheel;
-    DcMotor intake, transfer;
-    Servo hood;
+    private DcMotor backLeft, backRight, frontLeft, frontRight;
+    private DcMotorEx flywheel;
+    private DcMotor intake, transfer;
+    private Servo hood;
 
     @Override
     public void runOpMode() {
 
-        // Hardware
+        // Hardware mapping
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -31,63 +29,60 @@ public class autoTest extends LinearOpMode {
 
         // Directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
-        // PID
-        PIDController pid = new PIDController(0.00085f, 0.000002f, 0.00015f);
-        pid.set_output_limits(0, 1);  // power 0–1
-        pid.set_tolerance(50);
-
         waitForStart();
 
-        // hood
-        hood.setPosition(0.7);
-        sleep(300);
+        if (opModeIsActive()) {
 
-        // Short backward drive
-        setDrivePower(-0.4);
-        sleep(500);
-        setDrivePower(0);
+            // LOWER hood
+            hood.setPosition(0.7);
+            sleep(300);
 
-        // FLYWHEEL PID -----------------
-        int targetRPM = 2700;
-        pid.set_target(targetRPM);
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            // Drive backward
+            frontLeft.setPower(-0.4);
+            frontRight.setPower(-0.4);
+            backLeft.setPower(-0.4);
+            backRight.setPower(-0.4);
+            sleep(500);
 
-        // Spin-up for 3 seconds
-        long end = System.currentTimeMillis() + 2200;
-        while (opModeIsActive() && System.currentTimeMillis() < end) {
-            double currentRPM = (flywheel.getVelocity() / 28.0) * 60.0;
-            double power = pid.update(currentRPM);
-            flywheel.setPower(power);
+            // Stop drive
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+
+            // ----------------------------
+            int targetRPM = 2650;
+            double ticksPerRev = 28;
+            double targetVelocity = (targetRPM / 60.0) * ticksPerRev;
+
+            flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            flywheel.setVelocity(targetVelocity);  // << actual speed control
+
+            sleep(2000); // allow time to reach speed
+
+            // Run intake/transfer
+            intake.setPower(1.0);
+            transfer.setPower(-1.0);
+            sleep(2000);
+
+            intake.setPower(1.0);
+            transfer.setPower(-1.0);
+            sleep(2000);
+
+            // Stop intake/transfer
+            intake.setPower(0);
+            transfer.setPower(0);
+
+            // Extra flywheel time
+            sleep(1000);
+
+            // Stop flywheel
+            flywheel.setVelocity(0);
         }
-
-        shootBall(450);
-        sleep(350);
-
-        shootBall(450);
-        sleep(350);
-
-        shootBall(850);
-
-        // stop flywheel
-        sleep(500);
-        flywheel.setPower(0);
-    }
-
-    private void setDrivePower(double power) {
-        frontLeft.setPower(power);
-        frontRight.setPower(power);
-        backLeft.setPower(power);
-        backRight.setPower(power);
-    }
-
-    private void shootBall(int time) {
-        intake.setPower(1);
-        transfer.setPower(-1);
-        sleep(time);
-        intake.setPower(0);
-        transfer.setPower(0);
     }
 }
