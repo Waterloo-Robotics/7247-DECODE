@@ -31,11 +31,11 @@ public class AutoShooterTest extends OpMode {
     private double hoodPosition;
 
     private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2550, 2800, 2900, 3000, 3050, 3170, 3200, 3150, 3250, 3650,3650};
+    private float[] flywheel_speed = {2650, 2900, 3000, 3100, 3150, 3270, 3300, 3250, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
-
+    boolean AutoTargeting;
 
     @Override
     public void init() {
@@ -62,6 +62,8 @@ public class AutoShooterTest extends OpMode {
         flywheelRPM = 0;
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
+
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -120,7 +122,7 @@ public class AutoShooterTest extends OpMode {
         /* ---------------- FLYWHEEL CONTROL ---------------- */
 //        flywheelRPM += gamepad2.right_trigger * 50;
 //        flywheelRPM -= gamepad2.left_trigger * 50;
-        flywheelRPM = rpm;
+
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
 
@@ -171,7 +173,7 @@ public class AutoShooterTest extends OpMode {
         } else if (gamepad2.dpad_down) {
             hoodPosition += 0.005;
         }
-        hoodPosition = angle;
+
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if (gamepad2.dpad_left) {
@@ -187,6 +189,13 @@ public class AutoShooterTest extends OpMode {
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
+        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+            AutoTargeting = !AutoTargeting;
+        }
+        if(AutoTargeting == true){
+            flywheelRPM =rpm;
+            hoodPosition = angle;
+        }
 
         if (pose != null) {
             telemetry.addData("X (inches)",-pose.getX(DistanceUnit.INCH)*1.75);
