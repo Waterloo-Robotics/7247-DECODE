@@ -157,8 +157,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         }
 
         if (gamepad2.dpad_right) {
-            hoodPosition = 0.25;
-            flywheelRPM = 2500;
+            hoodPosition = 0.77;
+            flywheelRPM = 3000;
         }
 
         hood.setPosition(hoodPosition);
