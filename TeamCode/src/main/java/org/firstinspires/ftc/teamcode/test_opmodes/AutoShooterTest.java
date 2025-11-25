@@ -14,6 +14,8 @@ import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
+import java.util.Timer;
+
 @TeleOp(name="AutoShoota", group="TestOpMode")
 public class AutoShooterTest extends OpMode {
     private flywheelModule flywheelControl;
@@ -36,6 +38,9 @@ public class AutoShooterTest extends OpMode {
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
+    float rpm = 0;
+    float angle = 1;
+    int targeting_timer = 0;
 
     @Override
     public void init() {
@@ -70,8 +75,6 @@ public class AutoShooterTest extends OpMode {
     }
 
     public void loop() {
-        float rpm = 0;
-        float angle = 1;
         boolean limelight_available = false;
 
         Pose2D pose = llModule.limelightResult();
@@ -86,11 +89,18 @@ public class AutoShooterTest extends OpMode {
 
             rpm =  (flywheel_speed_table.Lookup(limelight_distance));
             angle = hood_angle_table.Lookup(limelight_distance);
+
+            targeting_timer = 0;
+        } else {
+            targeting_timer ++;
+
+            if (targeting_timer >= 20)
+            {
+                targeting_timer = 50;
+                rpm = 0;
+                angle = 1;
+            }
         }
-
-
-
-
 
 
 
@@ -192,8 +202,9 @@ public class AutoShooterTest extends OpMode {
         if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
             AutoTargeting = !AutoTargeting;
         }
-        if(AutoTargeting == true){
-            flywheelRPM =rpm;
+
+        if(AutoTargeting){
+            flywheelRPM = rpm;
             hoodPosition = angle;
         }
 
