@@ -16,7 +16,7 @@ public class LimelightProcessingModule {
 
     Telemetry telemetry;
 
-public Limelight3A limelight;
+    public Limelight3A limelight;
     public LimelightProcessingModule(Limelight3A limelight, Telemetry telemetry)
     {
         this.telemetry = telemetry;
@@ -26,9 +26,9 @@ public Limelight3A limelight;
     }
     /* ------ */
     /* limelightResult
-    *  The goal of this function is to return the robot position
-    *  relative to the april tag.
-    * */
+     *  The goal of this function is to return the robot position
+     *  relative to the april tag.
+     * */
     public Pose2D limelightResult() {
         LLResult llResult = this.limelight.getLatestResult();
 
@@ -48,4 +48,3 @@ public Limelight3A limelight;
     }
 
 }
-
