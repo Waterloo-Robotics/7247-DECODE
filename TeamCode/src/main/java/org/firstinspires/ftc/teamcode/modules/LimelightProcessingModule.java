@@ -32,20 +32,16 @@ public Limelight3A limelight;
     public Pose2D limelightResult() {
         LLResult llResult = this.limelight.getLatestResult();
 
-        if (llResult != null && llResult.isValid()) {
+        if (llResult != null && llResult.isValid())
+        {
             List<LLResultTypes.FiducialResult> results = llResult.getFiducialResults();
+            Pose3D robot_pose = results.get(0).getRobotPoseTargetSpace();
 
-            // now it gets field space and not target space so the telemetry should be correct
-            Pose3D robot_pose = results.get(0).getRobotPoseFieldSpace();
-
-            double x = robot_pose.getPosition().toUnit(DistanceUnit.INCH).x;
+            double x = robot_pose.getPosition().toUnit(DistanceUnit.INCH).z;
             double y = robot_pose.getPosition().toUnit(DistanceUnit.INCH).y;
             double rot = robot_pose.getOrientation().getYaw(AngleUnit.DEGREES);
-
             return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, rot);
         }
         return null;
     }
-
 }
-
