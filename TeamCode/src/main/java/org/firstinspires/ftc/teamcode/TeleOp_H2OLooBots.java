@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -25,13 +26,14 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor intake;
     private DcMotor transfer;
     private Servo hood;
-    private IMU imu;
+
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
     private float[] flywheel_speed = {2650, 2900, 3000, 3100, 3150, 3270, 3300, 3250, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
+    GoBildaPinpointDriver pinpoint;
 
     /* ---------- Modules & Sensors ---------- */
     private flywheelModule flywheelControl;
@@ -68,13 +70,12 @@ public class TeleOp_H2OLooBots extends OpMode {
 //
 //        llModule = new LimelightProcessingModule(limelight, telemetry);
 
-        IMU imu = hardwareMap.get(IMU.class, "imu");
-        // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
-        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-        imu.initialize(parameters);
+
+
+
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        pinpoint.recalibrateIMU();
+        pinpoint.resetPosAndIMU();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -105,17 +106,25 @@ public class TeleOp_H2OLooBots extends OpMode {
         double x = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
+        pinpoint.update();
 
         if (gamepad1.options) {
-            imu.resetYaw();
+            pinpoint.update();
+            pinpoint.resetPosAndIMU();
         }
 
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = pinpoint.getHeading(AngleUnit.RADIANS);  //=0 ODO IMU
+//        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS); //REV IMU
 
         // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+        double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
+        double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
 
+        rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn), 1);
         double frontLeftPower = (rotY + rotX + turn) / denominator;
         double backLeftPower = (rotY - rotX + turn) / denominator;
