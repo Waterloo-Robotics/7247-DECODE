@@ -117,8 +117,8 @@ public class TeleOp_H2OLooBots extends OpMode {
 //        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS); //REV IMU
 
         // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
-        double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
         rotX = rotX * 1.1;  // Counteract imperfect strafing
 
