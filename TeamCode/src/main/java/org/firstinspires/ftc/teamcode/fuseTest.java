@@ -77,9 +77,9 @@ public class fuseTest extends OpMode {
         estimator.update_from_pinpoint();
 
         // Use your proven LimelightProcessingModule to get global pose (0,0 = field center)
-        Pose2D tagPose = llModule.limelightResult();  // This is already field-space, correct origin
+        Pose2D tagPose = llModule.getFieldSpacePose();  // This is already field-space, correct origin
 
-        if (tagPose != null) {
+        if (tagPose != null && gamepad1.aWasPressed()) {
             lastValidTagPose = tagPose;
 
             // Correct Pinpoint to global field pose when tag is seen
