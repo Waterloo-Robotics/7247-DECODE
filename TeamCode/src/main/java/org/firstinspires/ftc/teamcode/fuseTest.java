@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -32,15 +33,16 @@ public class fuseTest extends OpMode {
     @Override
     public void init() {
         // Motors
-        backLeft   = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight  = hardwareMap.get(DcMotor.class, "backRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
 
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        // Mecanum motor directions
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         // Pinpoint + Estimator
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
@@ -49,29 +51,35 @@ public class fuseTest extends OpMode {
         // Limelight
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         llModule = new LimelightProcessingModule(limelight, telemetry);
-        estimator.attachLimelight(limelight);
+        estimator.attachLimelight(llModule);
     }
 
     @Override
     public void loop() {
-        // === DRIVETRAIN ===
-        double y = -gamepad1.left_stick_y * 0.6;
-        double x = gamepad1.left_stick_x * 0.6;
-        double turn = gamepad1.right_stick_x * 0.6;
+        double y = -gamepad1.left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
 
-        double fl = y + x + turn;
-        double fr = y - x - turn;
-        double bl = y - x + turn;
-        double br = y + x - turn;
 
-        double max = Math.max(Math.max(Math.abs(fl), Math.abs(fr)),
-                Math.max(Math.abs(bl), Math.abs(br)));
-        if (max > 1.0) { fl /= max; fr /= max; bl /= max; br /= max; }
+        double frontLeftPower = y + x + turn;
+        double frontRightPower = y - x - turn;
+        double backLeftPower = y - x + turn;
+        double backRightPower = y + x - turn;
 
-        frontLeft.setPower(fl);
-        frontRight.setPower(fr);
-        backLeft.setPower(bl);
-        backRight.setPower(br);
+        double max = Math.max(Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
+                Math.max(Math.abs(backLeftPower), Math.abs(backRightPower)));
+        if (max > 1.0) {
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
+        }
+
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
+
 
         // === UPDATE SENSORS ===
         estimator.update_from_pinpoint();

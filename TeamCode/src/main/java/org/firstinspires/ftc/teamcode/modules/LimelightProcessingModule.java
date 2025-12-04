@@ -55,7 +55,7 @@ public class LimelightProcessingModule {
 
                 // Correct SDK method name
                 Pose3D robotPoseField = results.get(0).getRobotPoseFieldSpace();
-                if (robotPoseField == null) return null;
+//                if (robotPoseField == null) return null;
 
                 double x = robotPoseField.getPosition().toUnit(DistanceUnit.INCH).x;
                 double y = robotPoseField.getPosition().toUnit(DistanceUnit.INCH).y;

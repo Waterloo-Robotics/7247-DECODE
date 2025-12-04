@@ -18,7 +18,7 @@ public class FieldPositionEstimation {
     public Pose2D relative_robot_position;
     private boolean on_red_side; // what is this for?
 
-    private Limelight3A limelight;
+    private LimelightProcessingModule limelight;
     private Pose2D limelight_position;
 
     public FieldPositionEstimation(GoBildaPinpointDriver pinpoint, boolean on_red_side)
@@ -32,10 +32,8 @@ public class FieldPositionEstimation {
         );
     }
 
-    public void attachLimelight(Limelight3A limelight) {
+    public void attachLimelight(LimelightProcessingModule limelight) {
         this.limelight = limelight;
-        this.limelight.pipelineSwitch(0);
-        this.limelight.start();
     }
     public void update_from_pinpoint() {
         pinpoint.update();
@@ -44,23 +42,14 @@ public class FieldPositionEstimation {
         double rot = pinpoint.getHeading(AngleUnit.DEGREES);
         this.relative_robot_position = new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, rot);
     }
+
     public void update_from_limelight() {
         if (this.limelight == null) return;
 
-        LLResult llResult = this.limelight.getLatestResult();
+        Pose2D field_pos = this.limelight.getFieldSpacePose();
 
-        if (llResult != null && llResult.isValid()) {
-            List<LLResultTypes.FiducialResult> results = llResult.getFiducialResults();
-            if (results.isEmpty()) return;
-
-            Pose3D robotPoseField = results.get(0).getRobotPoseFieldSpace();
-            if (robotPoseField == null) return;
-
-            double x = robotPoseField.getPosition().toUnit(DistanceUnit.INCH).x;
-            double y = robotPoseField.getPosition().toUnit(DistanceUnit.INCH).y;
-            double heading = robotPoseField.getOrientation().getYaw(AngleUnit.DEGREES);
-
-            this.limelight_position = new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
+        if (field_pos != null ) {
+            this.limelight_position = field_pos;
         }
     }
 
