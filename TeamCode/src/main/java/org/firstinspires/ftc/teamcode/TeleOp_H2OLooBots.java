@@ -29,6 +29,9 @@ public class TeleOp_H2OLooBots extends OpMode {
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
+    boolean toggle;
+    // toggle false = automatic control
+    // toggle true  = manual control
 
     /* ---------- Modules & Sensors ---------- */
     private flywheelModule flywheelControl;
@@ -52,6 +55,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
 
+        toggle = false;
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
@@ -70,12 +74,14 @@ public class TeleOp_H2OLooBots extends OpMode {
     }
 
     public void loop() {
+        /* ---------------- AUTOMATIC AIMING ---------------- */
         float rpm = 0;
         float angle = 1;
         boolean limelight_available = false;
 
         Pose2D pose = llModule.limelightResult();
 
+        if (toggle == false){
         float limelight_distance = 0;
         if (pose != null) {
             limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
@@ -86,9 +92,22 @@ public class TeleOp_H2OLooBots extends OpMode {
 
             rpm =  (flywheel_speed_table.Lookup(limelight_distance));
             angle = hood_angle_table.Lookup(limelight_distance);
+             }
         }
 
+        /* --------------- TOGGLE --------------------------*/
+        if (toggle == false || gamepad2.left_stick_button || gamepad2.right_stick_button) {
+            toggle = true;
+            /* ---------------- FLYWHEEL CONTROL ---------------- */
+            flywheelRPM += gamepad2.right_trigger * 50;
+            flywheelRPM -= gamepad2.left_trigger * 50;
 
+            flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
+            flywheelControl.set_speed((int) flywheelRPM);
+        }
+        if (toggle == true || gamepad2.left_stick_button || gamepad2.right_stick_button) {
+            toggle = false;
+        }
         /* ---------------- DRIVE CODE ---------------- */
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
@@ -114,12 +133,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
-        /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad2.right_trigger * 50;
-        flywheelRPM -= gamepad2.left_trigger * 50;
 
-        flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
-        flywheelControl.set_speed((int) flywheelRPM);
 
         /* ---------------- BALL / INTAKE / TRANSFER CONTROL ---------------- */
         double intakePower = 0.0;
