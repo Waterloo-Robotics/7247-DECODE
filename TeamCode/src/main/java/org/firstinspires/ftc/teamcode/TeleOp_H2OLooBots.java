@@ -115,8 +115,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         backRight.setPower(backRightPower);
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad2.right_trigger * 50;
-        flywheelRPM -= gamepad2.left_trigger * 50;
+
 
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
@@ -176,6 +175,10 @@ public class TeleOp_H2OLooBots extends OpMode {
         if(AutoTargeting) {
             flywheelRPM = rpm;
             hoodPosition = angle;
+        }
+        else {
+            flywheelRPM += gamepad2.right_trigger * 50;
+            flywheelRPM -= gamepad2.left_trigger * 50;
         }
 
         if (gamepad2.dpad_left) {
