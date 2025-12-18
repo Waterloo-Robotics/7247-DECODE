@@ -46,6 +46,13 @@ public class IndexerTest extends OpMode {
             SlotTH.setPosition(1);
 
         }
+
+        if (gamepad1.y) {
+            SlotTH.setPosition(0);
+            SlotT.setPosition(0);
+            SlotO.setPosition(0);
+
+        }
     }
 }
 
