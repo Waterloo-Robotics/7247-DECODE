@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.modules.AngleModule;
 import org.firstinspires.ftc.teamcode.modules.DesiredAngleModule;
 import org.firstinspires.ftc.teamcode.modules.FieldPositionEstimation;
 
-@TeleOp(name=" Angle Module Test", group="TestOpMode")
+@TeleOp(name=" Desired Angle Test", group="TestOpMode")
 public class DesiredAngleTest extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
