@@ -118,8 +118,7 @@ public class TeleOp_H2OLooBots extends OpMode {
 //
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-        flywheelRPM += gamepad2.right_trigger * 50;
-        flywheelRPM -= gamepad2.left_trigger * 50;
+
 
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
@@ -166,11 +165,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
-        if (gamepad2.dpad_up) {
-            hoodPosition -= 0.005;
-        } else if (gamepad2.dpad_down) {
-            hoodPosition += 0.005;
-        }
+
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
@@ -179,6 +174,16 @@ public class TeleOp_H2OLooBots extends OpMode {
         if(AutoTargeting) {
             flywheelRPM = rpm;
             hoodPosition = angle;
+        }
+        else {
+            flywheelRPM += gamepad2.right_trigger * 50;
+            flywheelRPM -= gamepad2.left_trigger * 50;
+
+            if (gamepad2.right_bumper) {
+                hoodPosition -= 0.005;
+            } else if (gamepad2.left_bumper) {
+                hoodPosition += 0.005;
+            }
         }
 
         if (gamepad2.dpad_left) {
