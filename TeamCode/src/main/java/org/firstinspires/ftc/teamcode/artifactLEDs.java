@@ -29,5 +29,6 @@ public class artifactLEDs extends OpMode {
 
     @Override
     public void loop() {
-    }
+
+          }
 }
