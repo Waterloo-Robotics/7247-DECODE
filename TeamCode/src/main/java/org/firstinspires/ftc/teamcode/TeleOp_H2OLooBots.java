@@ -32,7 +32,7 @@ public class TeleOp_H2OLooBots extends OpMode {
 
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
     private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3120, 3300, 3900,3900};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.55, (float)0.50};
+    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.6, (float)0.55};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
