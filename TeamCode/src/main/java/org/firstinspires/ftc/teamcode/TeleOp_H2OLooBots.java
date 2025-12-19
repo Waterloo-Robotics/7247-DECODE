@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,9 +8,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
 
 @TeleOp(name="H2O Loo Bots Teleop", group="LinearOpMode")
 public class TeleOp_H2OLooBots extends OpMode {
@@ -23,12 +27,16 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor intake;
     private DcMotor transfer;
     private Servo hood;
+
+    FCDrivebaseModule drivebase;
+
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
     private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3170, 3350, 3900,3900};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
+    GoBildaPinpointDriver pinpoint;
 
     /* ---------- Modules & Sensors ---------- */
     private flywheelModule flywheelControl;
@@ -51,6 +59,11 @@ public class TeleOp_H2OLooBots extends OpMode {
         transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        pinpoint.recalibrateIMU();
+        pinpoint.resetPosAndIMU();
+
+        drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -64,6 +77,11 @@ public class TeleOp_H2OLooBots extends OpMode {
         flywheelRPM = 0;
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
+
+
+
+
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -93,29 +111,14 @@ public class TeleOp_H2OLooBots extends OpMode {
 
 
         /* ---------------- DRIVE CODE ---------------- */
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x;
+        pinpoint.update();
+        drivebase.update_Drive(gamepad1.left_stick_x,-gamepad1.left_stick_y, gamepad1.right_stick_x);
 
-
-        double frontLeftPower = y + x + turn;
-        double frontRightPower = y - x - turn;
-        double backLeftPower = y - x + turn;
-        double backRightPower = y + x - turn;
-
-        double max = Math.max(Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
-                Math.max(Math.abs(backLeftPower), Math.abs(backRightPower)));
-        if (max > 1.0) {
-            frontLeftPower /= max;
-            frontRightPower /= max;
-            backLeftPower /= max;
-            backRightPower /= max;
+        if (gamepad1.options) {
+            pinpoint.update();
+            pinpoint.resetPosAndIMU();
         }
-
-        frontLeft.setPower(frontLeftPower);
-        frontRight.setPower(frontRightPower);
-        backLeft.setPower(backLeftPower);
-        backRight.setPower(backRightPower);
+//
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
         flywheelRPM += gamepad2.right_trigger * 50;
