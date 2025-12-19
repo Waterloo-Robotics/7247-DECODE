@@ -31,7 +31,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     FCDrivebaseModule drivebase;
 
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3170, 3350, 3900,3900};
+    private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3120, 3300, 3900,3900};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
@@ -44,7 +44,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     private LimelightProcessingModule llModule;
 
     /* ---------- Variables ---------- */
-    private double hoodPosition = 0.4; // start in mid position
+    private double hoodPosition = 1; // start with hood down
     private double flywheelRPM;
 
     @Override
@@ -105,9 +105,11 @@ public class TeleOp_H2OLooBots extends OpMode {
                 limelight_available = true;
             }
 
-            rpm =  (flywheel_speed_table.Lookup(limelight_distance));
+           if(limelight_available){
+               rpm =  (flywheel_speed_table.Lookup(limelight_distance));
             angle = hood_angle_table.Lookup(limelight_distance);
         }
+           }
 
 
         /* ---------------- DRIVE CODE ---------------- */
@@ -156,8 +158,10 @@ public class TeleOp_H2OLooBots extends OpMode {
         }
 
         // --- Flywheel Stop (A) ---
-        if (gamepad2.a) {
+        if (gamepad2.a || gamepad1.a) {
             flywheelRPM = 0;
+            hoodPosition =1;
+
         }
 
         // Apply powers
