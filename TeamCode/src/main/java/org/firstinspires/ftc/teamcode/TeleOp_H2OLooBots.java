@@ -24,7 +24,7 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor transfer;
     private Servo hood;
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2650, 2900, 3000, 3100, 3150, 3270, 3300, 3250, 3350, 4000,4000};
+    private float[] flywheel_speed = {2550, 2650, 2700, 2800, 2950, 3270, 3300, 3250, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
