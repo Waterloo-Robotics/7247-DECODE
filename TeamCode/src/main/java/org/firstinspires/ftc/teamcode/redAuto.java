@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "autoTest", group = "Auto")
-public class autoTest extends LinearOpMode {
+@Autonomous(name = "redAuto", group = "Auto")
+public class redAuto extends LinearOpMode {
 
     private DcMotor backLeft, backRight, frontLeft, frontRight;
     private DcMotorEx flywheel;
@@ -68,11 +68,15 @@ public class autoTest extends LinearOpMode {
             // Run intake/transfer
             intake.setPower(1.0);
             transfer.setPower(-1.0);
-            sleep(2000);
+            sleep(1000);
 
             intake.setPower(1.0);
             transfer.setPower(-1.0);
-            sleep(2000);
+            sleep(1000);
+
+            intake.setPower(1.0);
+            transfer.setPower(-1.0);
+            sleep(1000);
 
             // Stop intake/transfer
             intake.setPower(0);
@@ -91,10 +95,10 @@ public class autoTest extends LinearOpMode {
             backRight.setPower(0.5);
 
             sleep(500);
-            frontLeft.setPower(-1);
-            frontRight.setPower(-1);
-            backLeft.setPower(-1);
-            backRight.setPower(-1);
+            frontLeft.setPower(-0.3);
+            frontRight.setPower(-0.3);
+            backLeft.setPower(-0.3);
+            backRight.setPower(-0.3);
             sleep(1000);
 
         }

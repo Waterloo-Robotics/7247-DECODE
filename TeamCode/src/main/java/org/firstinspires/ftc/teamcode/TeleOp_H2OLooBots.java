@@ -24,8 +24,8 @@ public class TeleOp_H2OLooBots extends OpMode {
     private DcMotor transfer;
     private Servo hood;
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2550, 2650, 2700, 2800, 2950, 3270, 3300, 3250, 3350, 4000,4000};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
+    private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3170, 3350, 3900,3900};
+    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
@@ -67,6 +67,9 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+    }
+    public void start() {
+
     }
 
     public void loop() {
@@ -115,7 +118,8 @@ public class TeleOp_H2OLooBots extends OpMode {
         backRight.setPower(backRightPower);
 
         /* ---------------- FLYWHEEL CONTROL ---------------- */
-
+        flywheelRPM += gamepad2.right_trigger * 50;
+        flywheelRPM -= gamepad2.left_trigger * 50;
 
         flywheelRPM = Math.max(0, Math.min(4200, flywheelRPM));
         flywheelControl.set_speed((int) flywheelRPM);
@@ -162,25 +166,20 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("Transfer Power", transferPower);
 
         /* ---------------- HOOD CONTROL ---------------- */
-
+//        if (gamepad2.dpad_up) {
+//            hoodPosition -= 0.005;
+//        } else if (gamepad2.dpad_down) {
+//            hoodPosition += 0.005;
+//        }
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
         if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
             AutoTargeting = !AutoTargeting;
+
         }
         if(AutoTargeting) {
             flywheelRPM = rpm;
             hoodPosition = angle;
-        }
-        else {
-            flywheelRPM += gamepad2.right_trigger * 50;
-            flywheelRPM -= gamepad2.left_trigger * 50;
-
-            if (gamepad2.right_bumper) {
-                hoodPosition -= 0.005;
-            } else if (gamepad2.left_bumper) {
-                hoodPosition += 0.005;
-            }
         }
 
         if (gamepad2.dpad_left) {
@@ -216,6 +215,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addLine("Left = Short | Right = Far");
+        telemetry.addData("AutoTargeting",AutoTargeting);
         telemetry.update();
     }
 }
