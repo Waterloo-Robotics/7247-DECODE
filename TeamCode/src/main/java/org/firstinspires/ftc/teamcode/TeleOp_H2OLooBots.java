@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -12,8 +14,6 @@ import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.IMU;
 
 @TeleOp(name="H2O Loo Bots Teleop", group="LinearOpMode")
 public class TeleOp_H2OLooBots extends OpMode {
@@ -94,7 +94,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
-       
+
         float rpm = 0;
         float angle = 1;
         boolean limelight_available = false;
