@@ -60,8 +60,7 @@ public class TeleOp_H2OLooBots extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.recalibrateIMU();
-        pinpoint.resetPosAndIMU();
+
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
@@ -91,6 +90,11 @@ public class TeleOp_H2OLooBots extends OpMode {
     }
 
     public void loop() {
+
+        if(hoodPosition <= .4){
+            hoodPosition = .4;
+        }
+       
         float rpm = 0;
         float angle = 1;
         boolean limelight_available = false;
