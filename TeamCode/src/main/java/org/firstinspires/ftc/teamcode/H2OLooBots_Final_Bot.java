@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -31,6 +32,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Servo ball2;
     private Servo ball3;
     private Servo hood;
+    private RevColorSensorV3 color1a;
+    private RevColorSensorV3 color1b;
+    private RevColorSensorV3 color2a;
+    private RevColorSensorV3 color2b;
+    private RevColorSensorV3 color3a;
+    private RevColorSensorV3 color3b;
 
 
     FCDrivebaseModule drivebase;
@@ -39,11 +46,11 @@ public class H2OLooBots_Final_Bot extends OpMode {
     @Override
     public void init() {
         /* ----- Hardware Map ----- */
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");  // ORANGE & port 1 on EXPANTION hub
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");  // ORANGE & port 1 on EXPANSION hub
         backRight = hardwareMap.get(DcMotor.class, "backRight"); // GREEN & port 2 on CONTROL hub
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight"); //BLUE & port 1 on CONTOL hub
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");  // RED  & port 0 on EXPANTION hub
-        backIntake= hardwareMap.get(DcMotor.class, "backIntake"); // YELLOW & port 2 on EXPANTION hub
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight"); //BLUE & port 1 on CONTROL hub
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");  // RED  & port 0 on EXPANSION hub
+        backIntake= hardwareMap.get(DcMotor.class, "backIntake"); // YELLOW & port 2 on EXPANSION hub
         frontIntake= hardwareMap.get(DcMotor.class, "frontIntake"); // PURPLE & port 0 on CONTROL
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         turretRotation = hardwareMap.get(DcMotor.class, "turretRotation");
@@ -52,6 +59,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
         ball2 = hardwareMap.get(Servo.class, "ball2");
         ball3 = hardwareMap.get(Servo.class, "ball3");
         hood = hardwareMap.get(Servo.class, "hood");
+        color1a = hardwareMap.get(RevColorSensorV3.class, "color1a"); // BLUE & 12c Bus 3 on EXPANSION hub
+        color1b = hardwareMap.get(RevColorSensorV3.class, "color1b"); // PURPLE & 12c Bus 2 on EXPANSION hub
+        color2a = hardwareMap.get(RevColorSensorV3.class, "color2a"); // YELLOW & 12c Bus 3 on CONTROL hub
+        color2b = hardwareMap.get(RevColorSensorV3.class, "color2b"); // GREEN & 12c Bus 2 on CONTROL hub
+        color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
+        color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
 
 
 
