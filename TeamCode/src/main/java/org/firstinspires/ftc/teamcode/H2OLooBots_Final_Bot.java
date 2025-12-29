@@ -23,10 +23,16 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private DcMotor backRight;
     private DcMotor frontLeft;
     private DcMotor frontRight;
-
     private DcMotor backIntake;
-
     private DcMotor frontIntake;
+    private DcMotor turretRotation;
+    private DcMotor flywheel;
+    private Servo ball1;
+    private Servo ball2;
+    private Servo ball3;
+    private Servo hood;
+
+
     FCDrivebaseModule drivebase;
     GoBildaPinpointDriver pinpoint;
 
@@ -39,7 +45,17 @@ public class H2OLooBots_Final_Bot extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");  // RED  & port 0 on EXPANTION hub
         backIntake= hardwareMap.get(DcMotor.class, "backIntake"); // YELLOW & port 2 on EXPANTION hub
         frontIntake= hardwareMap.get(DcMotor.class, "frontIntake"); // PURPLE & port 0 on CONTROL
+        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        turretRotation = hardwareMap.get(DcMotor.class, "turretRotation");
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint"); // 12c Bus 0 on CONTROL hub
+        ball1 = hardwareMap.get(Servo.class, "ball1");
+        ball2 = hardwareMap.get(Servo.class, "ball2");
+        ball3 = hardwareMap.get(Servo.class, "ball3");
+        hood = hardwareMap.get(Servo.class, "hood");
+
+
+
+
 
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
