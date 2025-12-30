@@ -31,17 +31,17 @@ public class artifactlaunch extends OpMode {
     @Override
     public void init() {
         // Sensors
-        pocket1A = hardwareMap.get(RevColorSensorV3.class, "pocket1A");
-        pocket1B = hardwareMap.get(RevColorSensorV3.class, "pocket1B");
-        pocket2A = hardwareMap.get(RevColorSensorV3.class, "pocket2A");
-        pocket2B = hardwareMap.get(RevColorSensorV3.class, "pocket2B");
-        pocket3A = hardwareMap.get(RevColorSensorV3.class, "pocket3A");
-        pocket3B = hardwareMap.get(RevColorSensorV3.class, "pocket3B");
+        pocket1A = hardwareMap.get(RevColorSensorV3.class, "color1a");
+        pocket1B = hardwareMap.get(RevColorSensorV3.class, "color1b");
+        pocket2A = hardwareMap.get(RevColorSensorV3.class, "color2a");
+        pocket2B = hardwareMap.get(RevColorSensorV3.class, "color2b");
+        pocket3A = hardwareMap.get(RevColorSensorV3.class, "color3a");
+        pocket3B = hardwareMap.get(RevColorSensorV3.class, "color3b");
 
         // Servos
-        servo1 = hardwareMap.get(Servo.class, "servo1");
-        servo2 = hardwareMap.get(Servo.class, "servo2");
-        servo3 = hardwareMap.get(Servo.class, "servo3");
+        servo1 = hardwareMap.get(Servo.class, "ball1");
+        servo2 = hardwareMap.get(Servo.class, "ball2");
+        servo3 = hardwareMap.get(Servo.class, "ball3");
 
         // rest pos (probably need to adjust later)
         servo1.setPosition(0.0);
@@ -87,6 +87,7 @@ public class artifactlaunch extends OpMode {
         telemetry.addData("Available Purples", availablePurples);
         telemetry.addData("Available Greens", availableGreens);
         telemetry.addData("Launching", isLaunching ? "Yes" : "No");
+        telemetry.addLine("UP: PURPLE | DOWN: GREEN");
         telemetry.update();
     }
 
