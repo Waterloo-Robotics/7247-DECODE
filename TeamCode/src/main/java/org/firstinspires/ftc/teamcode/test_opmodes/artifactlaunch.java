@@ -44,9 +44,9 @@ public class artifactlaunch extends OpMode {
         servo3 = hardwareMap.get(Servo.class, "ball3");
 
         // rest pos (probably need to adjust later)
-        servo1.setPosition(0.0);
-        servo2.setPosition(0.0);
-        servo3.setPosition(0.0);
+        servo1.setPosition(1.0);
+        servo2.setPosition(1.0);
+        servo3.setPosition(0);
 
         telemetry.update();
     }
@@ -133,10 +133,10 @@ public class artifactlaunch extends OpMode {
             /////// ughhhhhhh we gotta like test this??? ughhh i hate work why cant we just cast a spell to know the correct servo positions
             // ready to change this later
             case 1:
-                servo1.setPosition(1.0);
+                servo1.setPosition(0);
                 break;
             case 2:
-                servo2.setPosition(1.0);
+                servo2.setPosition(0);
                 break;
             case 3:
                 servo3.setPosition(1.0);
@@ -145,8 +145,8 @@ public class artifactlaunch extends OpMode {
     }
 
     private void resetAllServos() {
-        servo1.setPosition(0.0);
-        servo2.setPosition(0.0);
+        servo1.setPosition(1.0);
+        servo2.setPosition(1.0);
         servo3.setPosition(0.0);
     }
 
