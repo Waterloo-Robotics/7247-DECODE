@@ -17,28 +17,21 @@ public class IndexerTest extends OpMode {
     @Override
     public void init(){
 
-        SlotO = hardwareMap.get(Servo.class, "SlotOne");
-        SlotT = hardwareMap.get(Servo.class, "SlotTwo");
-        SlotTH = hardwareMap.get(Servo.class, "SlotThree");
-    }
-    public void init_loop() {
-    }
-
-
-    @Override
-    public void start() {
+        SlotO = hardwareMap.get(Servo.class, "ball1");
+        SlotT = hardwareMap.get(Servo.class, "ball2");
+        SlotTH = hardwareMap.get(Servo.class, "ball3");
     }
 
     @Override
     public void loop() {
 
         if (gamepad1.x) {
-            SlotO.setPosition(1);
+            SlotO.setPosition(0);
 
         }
 
         if (gamepad1.a) {
-            SlotT.setPosition(1);
+            SlotT.setPosition(0);
 
         }
 
@@ -49,8 +42,8 @@ public class IndexerTest extends OpMode {
 
         if (gamepad1.y) {
             SlotTH.setPosition(0);
-            SlotT.setPosition(0);
-            SlotO.setPosition(0);
+            SlotT.setPosition(1);
+            SlotO.setPosition(1);
 
         }
     }
