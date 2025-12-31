@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
+
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
@@ -91,8 +92,8 @@ public class TeleOp_H2OLooBots extends OpMode {
 
     public void loop() {
 
-        if(hoodPosition <= .4){
-            hoodPosition = .4;
+        if(hoodPosition <= .45){
+            hoodPosition = .45;
         }
 
         float rpm = 0;
@@ -103,17 +104,22 @@ public class TeleOp_H2OLooBots extends OpMode {
 
         float limelight_distance = 0;
         if (pose != null) {
-            limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
+            limelight_distance = (float) (1.75 * (float) -pose.getX(DistanceUnit.INCH));
 
-            if (limelight_distance < 81 || limelight_distance > 124) {
+            if (limelight_distance < 81 || limelight_distance > 110) {
                 limelight_available = true;
             }
 
-           if(limelight_available){
-               rpm =  (flywheel_speed_table.Lookup(limelight_distance));
-            angle = hood_angle_table.Lookup(limelight_distance);
+            if (limelight_available) {
+                rpm = (flywheel_speed_table.Lookup(limelight_distance));
+                angle = hood_angle_table.Lookup(limelight_distance);
+            }
+            else if (hood_angle_table.Lookup(limelight_distance) <= .45) {
+                angle = .45F;
+            }
         }
-           }
+
+
 
 
         /* ---------------- DRIVE CODE ---------------- */
