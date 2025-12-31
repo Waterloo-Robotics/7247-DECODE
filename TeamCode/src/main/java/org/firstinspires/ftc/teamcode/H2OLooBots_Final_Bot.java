@@ -125,13 +125,16 @@ public class H2OLooBots_Final_Bot extends OpMode {
         if (pose != null) {
             limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
 
-            if (limelight_distance < 81 || limelight_distance > 124) {
+            if (limelight_distance < 81 || limelight_distance > 110) {
                 limelight_available = true;
             }
 
             if(limelight_available){
                 rpm =  (flywheel_speed_table.Lookup(limelight_distance));
                 angle = hood_angle_table.Lookup(limelight_distance);
+            }
+            else if (hood_angle_table.Lookup(limelight_distance) <= .45) {
+                angle = .45F;
             }
         }
 
@@ -192,6 +195,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         // Apply powers
         frontIntake.setPower(intakePower);
+        backIntake.setPower(intakePower);
         flywheelControl.set_speed((int) flywheelRPM);
 
         telemetry.addData("Intake Power", intakePower);
