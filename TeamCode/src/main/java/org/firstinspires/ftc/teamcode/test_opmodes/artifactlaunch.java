@@ -23,7 +23,7 @@ public class artifactlaunch extends OpMode {
 
     private boolean isLaunching = false;
     private double launchEndTime = 0;
-    private static final double LAUNCH_DURATION = 0.4; // how long the servo stays in launch pos
+    private static final double LAUNCH_DURATION = 1.0; // how long the servo stays in launch pos
 
     private boolean prevDpadUp = false;
     private boolean prevDpadDown = false;
