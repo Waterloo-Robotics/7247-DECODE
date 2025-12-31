@@ -111,6 +111,14 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
+
+
+
+
+    // this part was given to me from discord ftc people so dont credit me for it
+
+
+
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
@@ -228,6 +236,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
+        
+
         /* ---------------- LIMELIGHT TELEMETRY ---------------- */
 
 
@@ -240,6 +250,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
         }
 
         /* ---------------- GENERAL TELEMETRY ---------------- */
+        telemetry.addLine("=== POCKET CONTENTS ===");
+
+        telemetry.addData("Pocket 1", detectColor(color1a, color1b));
+        telemetry.addData("Pocket 2", detectColor(color2a, color2b));
+        telemetry.addData("Pocket 3", detectColor(color3a, color3b));
+
         telemetry.addData("Flywheel RPM", flywheelRPM);
         telemetry.addData("Hood Position", hoodPosition);
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
@@ -247,9 +263,29 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("Feedforward", flywheelControl.feedforward_power);
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
-        telemetry.addLine("Left = Short | Right = Far");
         telemetry.addData("AutoTargeting",AutoTargeting);
         telemetry.update();
 
 }
-}
+    private String detectColor(RevColorSensorV3 sensorA, RevColorSensorV3 sensorB) {
+        int red   = (sensorA.red()   + sensorB.red())   / 2;
+        int green = (sensorA.green() + sensorB.green()) / 2;
+        int blue  = (sensorA.blue()  + sensorB.blue())  / 2;
+
+        // Use distance to detect if a ball is present
+        double avgDistance = (sensorA.getDistance(DistanceUnit.CM) +
+                sensorB.getDistance(DistanceUnit.CM)) / 2.0;
+
+        // Adjust this threshold based on your pocket setup (test with ball in/out)
+        if (avgDistance > 3.0) {
+            return "EMPTY";
+        }
+
+        if (green > red + 50 && green > blue + 50) {
+            return "GREEN";
+        } else if (red + blue > green + 80) {
+            return "PURPLE";
+        } else {
+            return "UNKNOWN";
+        }
+}}
