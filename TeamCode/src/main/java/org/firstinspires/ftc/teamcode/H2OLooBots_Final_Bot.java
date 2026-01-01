@@ -16,6 +16,9 @@ import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @TeleOp(name="H2OLooBots_Final_Bot", group="LinearOpMode")
 public class H2OLooBots_Final_Bot extends OpMode {
 
@@ -54,6 +57,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
     GoBildaPinpointDriver pinpoint;
+    // this is used for color sensors and the robot picking which ball to launch
+    private List<Integer> availablePurples = new ArrayList<>();
+    private List<Integer> availableGreens = new ArrayList<>();
+    private boolean isLaunching = false;
+    private double launchEndTime = 0;
+    private static final double LAUNCH_DURATION = 0.4;
 
     @Override
     public void init() {
@@ -79,11 +88,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-
-
-
-
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
         // Mecanum motor directions
@@ -93,28 +97,48 @@ public class H2OLooBots_Final_Bot extends OpMode {
         backRight.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
-        // Modules
+        // --- Modules ---
+
+        // flywheel
         flywheelControl = new flywheelModule(flywheel);
         flywheelRPM = 0;
 
+        // limelight
         llModule = new LimelightProcessingModule(limelight, telemetry);
+        limelight.start();
 
-
-
-
-
-
+        // Telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        /* rest position for servos
+        for some reason 3 is different from the rest
+        dont ask me why, i literally dont know
+        someone please fix with the srs programmer and update the code
+         */
+        ball1.setPosition(1.0);
+        ball2.setPosition(1.0);
+        ball3.setPosition(0);
     }
 
     @Override
     public void loop() {
+        updateAvailableBalls();
+        if (gamepad2.bWasPressed() && !isLaunching) {
+            launchNext("PURPLE");
+        }
+        if (gamepad2.xWasPressed() && !isLaunching) {
+            launchNext("GREEN");
+        }
 
+        if (isLaunching) {
+            if (getRuntime() >= launchEndTime) {
+                resetAllServos(); // return all servos to rest pos
+                isLaunching = false;
+            }
+        }
 
-
-
+        // hood software limit
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
@@ -210,7 +234,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
 //        }
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+        if(gamepad2.touchpadWasPressed()){
             AutoTargeting = !AutoTargeting;
 
         }
@@ -218,15 +242,11 @@ public class H2OLooBots_Final_Bot extends OpMode {
             flywheelRPM = rpm;
             hoodPosition = angle;
         }
-
-        if (gamepad2.dpad_left) {
-            hoodPosition = 0.725;
-            flywheelRPM = 3500;
+        if (gamepad2.dpadLeftWasPressed()) {
+            // add in stuff to make turret face front of bot
         }
-
-        if (gamepad2.dpad_right) {
-            hoodPosition = 0.575;
-            flywheelRPM = 3750;
+        if (gamepad2.dpadRightWasPressed()) {
+            // add in stuff to make turret face back of bot
         }
 
         hood.setPosition(hoodPosition);
@@ -261,8 +281,65 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
         telemetry.update();}
+    private void updateAvailableBalls() {
+        availablePurples.clear();
+        availableGreens.clear();
 
-    // ------- this is put as a string to decrease our loop time
+        String c1 = detectColor(color1a, color1b);
+        String c2 = detectColor(color2a, color2b);
+        String c3 = detectColor(color3a, color3b);
+
+        if ("PURPLE".equals(c1)) availablePurples.add(1);
+        if ("PURPLE".equals(c2)) availablePurples.add(2);
+        if ("PURPLE".equals(c3)) availablePurples.add(3);
+
+        if ("GREEN".equals(c1)) availableGreens.add(1);
+        if ("GREEN".equals(c2)) availableGreens.add(2);
+        if ("GREEN".equals(c3)) availableGreens.add(3);
+
+        // Already naturally sorted since we add in order 1->2->3
+    }
+    private void launchNext(String color) {
+        List<Integer> available = color.equals("PURPLE") ? availablePurples : availableGreens;
+
+        if (available.isEmpty()) {
+            // Nothing to launch
+            return;
+        }
+
+        // Launch the lowest-numbered pocket
+        int pocket = available.remove(0); // remove it so it's no longer considered available
+
+        launchPocket(pocket);
+
+        isLaunching = true;
+        launchEndTime = getRuntime() + LAUNCH_DURATION;
+    }
+
+    private void launchPocket(int pocket) {
+        switch (pocket) {
+
+            /////// ughhhhhhh we gotta like test this??? ughhh i hate work why cant we just cast a spell to know the correct servo positions
+            // ready to change this later
+            case 1:
+                ball1.setPosition(0);
+                break;
+            case 2:
+                ball2.setPosition(0);
+                break;
+            case 3:
+                ball3.setPosition(1.0);
+                break;
+        }
+    }
+
+    private void resetAllServos() {
+        ball1.setPosition(1.0);
+        ball2.setPosition(1.0);
+        ball3.setPosition(0.0);
+    }
+
+    // ------- this is put as a string to decrease our loop time -----------
     private String detectColor(RevColorSensorV3 sensorA, RevColorSensorV3 sensorB) {
         int red   = (sensorA.red()   + sensorB.red())   / 2;
         int green = (sensorA.green() + sensorB.green()) / 2;
@@ -271,7 +348,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         // Use distance to detect if a ball is present
         double avgDistance = (sensorA.getDistance(DistanceUnit.CM) +
                 sensorB.getDistance(DistanceUnit.CM)) / 2.0;
-        
+
         if (avgDistance > 3.0) {
             return "EMPTY";
         }

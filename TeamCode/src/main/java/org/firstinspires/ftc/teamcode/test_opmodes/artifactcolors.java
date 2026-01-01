@@ -35,8 +35,6 @@ public class artifactcolors extends OpMode {
         telemetry.addData("Pocket 3", detectColor(pocket3A, pocket3B));
         telemetry.update();
     }
-
-    // this part was given to me from discord ftc people so dont credit me for it
     private String detectColor(RevColorSensorV3 sensorA, RevColorSensorV3 sensorB) {
         int red   = (sensorA.red()   + sensorB.red())   / 2;
         int green = (sensorA.green() + sensorB.green()) / 2;
