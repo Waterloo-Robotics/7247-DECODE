@@ -115,10 +115,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
 
 
-    // this part was given to me from discord ftc people so dont credit me for it
-
-
-
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
@@ -264,9 +260,9 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
-        telemetry.update();
+        telemetry.update();}
 
-}
+    // ------- this is put as a string to decrease our loop time
     private String detectColor(RevColorSensorV3 sensorA, RevColorSensorV3 sensorB) {
         int red   = (sensorA.red()   + sensorB.red())   / 2;
         int green = (sensorA.green() + sensorB.green()) / 2;
@@ -275,8 +271,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         // Use distance to detect if a ball is present
         double avgDistance = (sensorA.getDistance(DistanceUnit.CM) +
                 sensorB.getDistance(DistanceUnit.CM)) / 2.0;
-
-        // Adjust this threshold based on your pocket setup (test with ball in/out)
+        
         if (avgDistance > 3.0) {
             return "EMPTY";
         }
