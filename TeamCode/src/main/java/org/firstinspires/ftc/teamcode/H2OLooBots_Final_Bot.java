@@ -64,6 +64,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private double launchEndTime = 0;
     private static final double LAUNCH_DURATION = 0.4;
 
+    private boolean launchAllInProgress = false;
+    private List<Integer> launchAllQueue = new ArrayList<>();
+    private int launchAllIndex = 0;
+    private double nextLaunchTime = 0;
+    private static final double TIME_BETWEEN_SHOTS = 0.52;  // tune this value
+
     @Override
     public void init() {
         /* ----- Hardware Map ----- */
@@ -124,6 +130,38 @@ public class H2OLooBots_Final_Bot extends OpMode {
     @Override
     public void loop() {
         updateAvailableBalls();
+
+        // launch all button
+        if (gamepad2.yWasPressed() && !isLaunching && !launchAllInProgress) {
+            launchAllQueue.clear();
+            if (!detectColor(color1a, color1b).equals("EMPTY")) launchAllQueue.add(1);
+            if (!detectColor(color2a, color2b).equals("EMPTY")) launchAllQueue.add(2);
+            if (!detectColor(color3a, color3b).equals("EMPTY")) launchAllQueue.add(3);
+
+            if (!launchAllQueue.isEmpty()) {
+                launchAllInProgress = true;
+                launchAllIndex = 0;
+                nextLaunchTime = getRuntime();
+            }
+        }
+        if (launchAllInProgress && !isLaunching) {
+            double now = getRuntime();
+            if (now >= nextLaunchTime) {
+                int pocket = launchAllQueue.get(launchAllIndex);
+                launchPocket(pocket);
+
+                isLaunching = true;
+                launchEndTime = now + LAUNCH_DURATION;
+
+                launchAllIndex++;
+                if (launchAllIndex >= launchAllQueue.size()) {
+                    launchAllInProgress = false;
+                } else {
+                    nextLaunchTime = now + TIME_BETWEEN_SHOTS;
+                }
+            }
+        }
+
         if (gamepad2.bWasPressed() && !isLaunching) {
             launchNext("PURPLE");
         }
@@ -252,7 +290,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        
+
 
         /* ---------------- LIMELIGHT TELEMETRY ---------------- */
 
@@ -280,7 +318,9 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
-        telemetry.update();}
+        telemetry.update();
+    }
+
     private void updateAvailableBalls() {
         availablePurples.clear();
         availableGreens.clear();
@@ -299,6 +339,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         // Already naturally sorted since we add in order 1->2->3
     }
+
     private void launchNext(String color) {
         List<Integer> available = color.equals("PURPLE") ? availablePurples : availableGreens;
 
@@ -360,4 +401,5 @@ public class H2OLooBots_Final_Bot extends OpMode {
         } else {
             return "UNKNOWN";
         }
-}}
+    }
+}
