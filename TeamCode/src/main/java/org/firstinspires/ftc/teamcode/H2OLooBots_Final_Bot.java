@@ -89,8 +89,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
         // Modules
@@ -106,6 +106,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+
 
     }
 
@@ -158,35 +160,46 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
         /* ---------------- BALL / INTAKE / TRANSFER CONTROL ---------------- */
-        double intakePower = 0.0;
+        double frontintakePower = 0.0;
+        double backintakePower = 0.0;
 
         // --- Touchpad reverses both while held ---
         if (gamepad2.touchpad || gamepad1.touchpad) {
-            intakePower = -1.0;      // reverse
+            frontintakePower = -1.0;
+            backintakePower = -1.0; // reverse
             flywheelRPM = 3500;
         }
 
         // --- Ball 1 (B) ---
 
         if (gamepad1.x || gamepad2.x) {
-            ball1.setPosition(0);
+            ball1.setPosition(0.5);
 
         }
 
         if (gamepad1.a || gamepad2.a) {
-            ball2.setPosition(0);
+            ball2.setPosition(0.5);
 
         }
 
         if (gamepad1.b || gamepad2.b) {
-            ball3.setPosition(1);
+            ball3.setPosition(0.5);
 
         }
 
         if (gamepad1.y || gamepad2.y) {
-            ball3.setPosition(0);
-            ball2.setPosition(1);
-            ball1.setPosition(1);
+            ball3.setPosition(1);
+            ball2.setPosition(0);
+            ball1.setPosition(0);
+        }
+
+        if (gamepad1.left_bumper) {
+            frontintakePower = 1;
+            backintakePower = 1;
+        }
+        else if (gamepad1.left_bumper) {
+            frontintakePower = 0;
+            backintakePower = 0;
         }
 
 
@@ -198,11 +211,13 @@ public class H2OLooBots_Final_Bot extends OpMode {
 //        }
 
         // Apply powers
-        frontIntake.setPower(intakePower);
-        backIntake.setPower(intakePower);
+        frontIntake.setPower(frontintakePower);
+        backIntake.setPower(backintakePower);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        telemetry.addData("Intake Power", intakePower);
+        telemetry.addData("front Power", frontintakePower);
+        telemetry.addData("back Power", backintakePower);
+
 //        if (gamepad2.dpad_up) {
 //            hoodPosition -= 0.005;
 //        } else if (gamepad2.dpad_down) {
@@ -231,6 +246,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
+
+
 
         
 
