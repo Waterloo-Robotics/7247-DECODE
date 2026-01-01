@@ -64,7 +64,7 @@ public class IndexerModule {
                 break;
             case SHOOT_ALL:
                 /* If there is a spot we just shot and it has returned back home, shoot the next spot */
-                if (this.last_fired_indexer != null && this.last_fired_indexer.isHome())
+                if (this.last_fired_indexer == null || (this.last_fired_indexer != null && this.last_fired_indexer.isHome()))
                 {
                     boolean shot_next = this.shootNext();
 
