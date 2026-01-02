@@ -4,6 +4,7 @@ import static android.os.SystemClock.sleep;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
+import org.firstinspires.ftc.teamcode.modules.IndexerModule;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
@@ -47,6 +49,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private flywheelModule flywheelControl;
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
+    private IndexerModule indexerModule;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
@@ -59,19 +62,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
     GoBildaPinpointDriver pinpoint;
-
-    // this is used for color sensors and the robot picking which ball to launch
-    private List<Integer> availablePurples = new ArrayList<>();
-    private List<Integer> availableGreens = new ArrayList<>();
-    private boolean isLaunching = false;
-    private double launchEndTime = 0;
-    private static final double LAUNCH_DURATION = 0.4;
-
-    private boolean launchAllInProgress = false;
-    private List<Integer> launchAllQueue = new ArrayList<>();
-    private int launchAllIndex = 0;
-    private double nextLaunchTime = 0;
-    private static final double TIME_BETWEEN_SHOTS = 0.52;  // tune this value
 
     @Override
     public void init() {
@@ -98,10 +88,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
-
-
-
-
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
         // Mecanum motor directions
@@ -117,69 +103,20 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
 
-
-
-
-
+        ((LynxI2cDeviceSynch) color1a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch) color1b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch) color2a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch) color2b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch) color3a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch) color3b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        indexerModule = new IndexerModule(ball1, color1a, color1b, ball2, color2a, color2b, ball3, color3a, color3b);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-
-
     }
 
     @Override
     public void loop() {
-
-//        updateAvailableBalls();
-
-        // launch all button
-//        if (gamepad2.yWasPressed() && !isLaunching && !launchAllInProgress) {
-//            launchAllQueue.clear();
-//            if (!detectColor(color1a, color1b).equals("EMPTY")) launchAllQueue.add(1);
-//            if (!detectColor(color2a, color2b).equals("EMPTY")) launchAllQueue.add(2);
-//            if (!detectColor(color3a, color3b).equals("EMPTY")) launchAllQueue.add(3);
-//
-//            if (!launchAllQueue.isEmpty()) {
-//                launchAllInProgress = true;
-//                launchAllIndex = 0;
-//                nextLaunchTime = getRuntime();
-//            }
-//        }
-//        if (launchAllInProgress && !isLaunching) {
-//            double now = getRuntime();
-//            if (now >= nextLaunchTime) {
-//                int pocket = launchAllQueue.get(launchAllIndex);
-//                launchPocket(pocket);
-//
-//                isLaunching = true;
-//                launchEndTime = now + LAUNCH_DURATION;
-//
-//                launchAllIndex++;
-//                if (launchAllIndex >= launchAllQueue.size()) {
-//                    launchAllInProgress = false;
-//                } else {
-//                    nextLaunchTime = now + TIME_BETWEEN_SHOTS;
-//                }
-//            }
-//        }
-
-        if (gamepad2.bWasPressed() && !isLaunching) {
-            launchNext("PURPLE");
-        }
-        if (gamepad2.xWasPressed() && !isLaunching) {
-            launchNext("GREEN");
-        }
-
-        if (isLaunching) {
-            if (getRuntime() >= launchEndTime) {
-                resetAllServos(); // return all servos to rest pos
-                isLaunching = false;
-            }
-        }
-
-
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
@@ -188,7 +125,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         float angle = 1;
         boolean limelight_available = false;
 
-        Pose2D pose = llModule.limelightResult();
+//        Pose2D pose = llModule.limelightResult();
+        Pose2D pose = null;
 
         float limelight_distance = 0;
         if (pose != null) {
@@ -228,50 +166,35 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         // --- Touchpad reverses both while held ---
         if (gamepad2.touchpad || gamepad1.touchpad) {
-            frontintakePower = -1.0;
-            backintakePower = -1.0; // reverse
             flywheelRPM = 3500;
-        }
-
-        // --- Ball 1 (B) ---
-
-        if (gamepad1.x || gamepad2.x) {
-            ball1.setPosition(0.5);
-            ball1.setPosition(0);
-
-        }
-
-        if (gamepad1.a || gamepad2.a) {
-            ball2.setPosition(0.5);
-
-        }
-
-        if (gamepad1.b || gamepad2.b) {
-            ball3.setPosition(0.5);
-
-        }
-
-        if (gamepad1.y || gamepad2.y) {
-            ball3.setPosition(1);
-            ball2.setPosition(0);
-            ball1.setPosition(0);
         }
 
         if (gamepad1.left_bumper) {
             frontintakePower = 1;
             backintakePower = 1;
         }
-        else if (gamepad1.left_bumper) {
+        else {
             frontintakePower = 0;
             backintakePower = 0;
         }
 
+        // --- Indexer controls ---
+        indexerModule.update();
+        if (gamepad2.bWasPressed())
+        {
+            indexerModule.shootGreen();
+        } else if (gamepad2.xWasPressed())
+        {
+            indexerModule.shootPurple();
+        } else if (gamepad2.yWasPressed())
+        {
+            indexerModule.shootAll();
+        }
 
         // --- Flywheel Stop (A) ---
 //        if (gamepad2.a || gamepad1.a) {
 //            flywheelRPM = 0;
 //            hoodPosition =1;
-//
 //        }
 
         // Apply powers
@@ -291,8 +214,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
             AutoTargeting = !AutoTargeting;
-
         }
+
         if(AutoTargeting) {
             flywheelRPM = rpm;
             hoodPosition = angle;
@@ -312,12 +235,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
 
-
-        
-
         /* ---------------- LIMELIGHT TELEMETRY ---------------- */
-
-
         if (pose != null) {
             telemetry.addData("X (inches)", pose.getX(DistanceUnit.INCH));
             telemetry.addData("Y (inches)", pose.getY(DistanceUnit.INCH));
@@ -327,12 +245,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         }
 
         /* ---------------- GENERAL TELEMETRY ---------------- */
-        telemetry.addLine("=== POCKET CONTENTS ===");
-
-        telemetry.addData("Pocket 1", detectColor(color1a, color1b));
-        telemetry.addData("Pocket 2", detectColor(color2a, color2b));
-        telemetry.addData("Pocket 3", detectColor(color3a, color3b));
-
         telemetry.addData("Flywheel RPM", flywheelRPM);
         telemetry.addData("Hood Position", hoodPosition);
         telemetry.addData("PID Error", flywheelControl.pid_controller.error);
@@ -341,88 +253,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
-        telemetry.update();}
-
-    // ------- this is put as a string to decrease our loop time
-    private String detectColor(RevColorSensorV3 sensorA, RevColorSensorV3 sensorB) {
-        int red   = (sensorA.red()   + sensorB.red())   / 2;
-        int green = (sensorA.green() + sensorB.green()) / 2;
-        int blue  = (sensorA.blue()  + sensorB.blue())  / 2;
-
-        // Use distance to detect if a ball is present
-        double avgDistance = (sensorA.getDistance(DistanceUnit.CM) +
-                sensorB.getDistance(DistanceUnit.CM)) / 2.0;
-        
-        if (avgDistance > 3.0) {
-            return "EMPTY";
-        }
-
-        if (green > red + 50 && green > blue + 50) {
-            return "GREEN";
-        } else if (red + blue > green + 80) {
-            return "PURPLE";
-        } else {
-            return "UNKNOWN";
-        }
+        telemetry.update();
     }
-    private void updateAvailableBalls() {
-        availablePurples.clear();
-        availableGreens.clear();
-
-        String c1 = detectColor(color1a, color1b);
-        String c2 = detectColor(color2a, color2b);
-        String c3 = detectColor(color3a, color3b);
-
-        if ("PURPLE".equals(c1)) availablePurples.add(1);
-        if ("PURPLE".equals(c2)) availablePurples.add(2);
-        if ("PURPLE".equals(c3)) availablePurples.add(3);
-
-        if ("GREEN".equals(c1)) availableGreens.add(1);
-        if ("GREEN".equals(c2)) availableGreens.add(2);
-        if ("GREEN".equals(c3)) availableGreens.add(3);
-
-        // Already naturally sorted since we add in order 1->2->3
-    }
-
-    private void launchNext(String color) {
-        List<Integer> available = color.equals("PURPLE") ? availablePurples : availableGreens;
-
-        if (available.isEmpty()) {
-            // Nothing to launch
-            return;
-        }
-
-        // Launch the lowest-numbered pocket
-        int pocket = available.remove(0); // remove it so it's no longer considered available
-
-        launchPocket(pocket);
-
-        isLaunching = true;
-        launchEndTime = getRuntime() + LAUNCH_DURATION;
-    }
-
-    private void launchPocket(int pocket) {
-        switch (pocket) {
-
-            /////// ughhhhhhh we gotta like test this??? ughhh i hate work why cant we just cast a spell to know the correct servo positions
-            // ready to change this later
-            case 1:
-                ball1.setPosition(0);
-                break;
-            case 2:
-                ball2.setPosition(0);
-                break;
-            case 3:
-                ball3.setPosition(1.0);
-                break;
-        }
-    }
-
-    private void resetAllServos() {
-        ball1.setPosition(1.0);
-        ball2.setPosition(1.0);
-        ball3.setPosition(0.0);
-    }
-
-
 }

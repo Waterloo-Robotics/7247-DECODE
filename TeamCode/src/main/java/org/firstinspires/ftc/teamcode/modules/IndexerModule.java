@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.modules;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class IndexerModule {
@@ -10,7 +11,7 @@ public class IndexerModule {
     public IndexerSpot artifact_2;
     public IndexerSpot artifact_3;
 
-    public List<IndexerSpot> artifacts;
+    public List<IndexerSpot> artifacts = new ArrayList<>();
     public int num_artifacts = 0;
 
     public enum ModuleStates {
@@ -26,9 +27,9 @@ public class IndexerModule {
                          Servo a2_servo, RevColorSensorV3 a2_color_a, RevColorSensorV3 a2_color_b,
                          Servo a3_servo, RevColorSensorV3 a3_color_a, RevColorSensorV3 a3_color_b)
     {
-        this.artifact_1 = new IndexerSpot(a1_servo, a1_color_a, a1_color_b);
-        this.artifact_2 = new IndexerSpot(a2_servo, a2_color_a, a2_color_b);
-        this.artifact_3 = new IndexerSpot(a3_servo, a3_color_a, a3_color_b);
+        this.artifact_1 = new IndexerSpot(a1_servo, a1_color_a, a1_color_b, 0.9, 0, 0.78);
+        this.artifact_2 = new IndexerSpot(a2_servo, a2_color_a, a2_color_b, 0.5, 0, 0.38);
+        this.artifact_3 = new IndexerSpot(a3_servo, a3_color_a, a3_color_b, 0.4, 1, 0.52);
 
         this.artifacts.add(this.artifact_1);
         this.artifacts.add(this.artifact_2);
@@ -87,6 +88,11 @@ public class IndexerModule {
             if (spot.artifact_status == ArtifactStatus.GREEN)
             {
                 spot.shoot();
+
+                if (this.num_artifacts == 2)
+                {
+                    raiseEmptySpot();
+                }
                 this.last_fired_indexer = spot;
                 return;
             }
@@ -105,6 +111,11 @@ public class IndexerModule {
             if (spot.artifact_status == ArtifactStatus.PURPLE)
             {
                 spot.shoot();
+                if (this.num_artifacts == 2)
+                {
+                    raiseEmptySpot();
+                }
+
                 this.last_fired_indexer = spot;
                 return;
             }
@@ -122,6 +133,11 @@ public class IndexerModule {
             if (spot.artifact_status != ArtifactStatus.EMPTY)
             {
                 spot.shoot();
+                if (this.num_artifacts == 2)
+                {
+                    raiseEmptySpot();
+                }
+
                 this.last_fired_indexer = spot;
                 /* True indicates that an artifact was found to shoot */
                 return true;
@@ -138,4 +154,15 @@ public class IndexerModule {
         this.module_state = ModuleStates.SHOOT_ALL;
     }
 
+    private void raiseEmptySpot()
+    {
+        for (IndexerSpot spot : this.artifacts)
+        {
+            if (spot.artifact_status == ArtifactStatus.EMPTY)
+            {
+                spot.blockMiddle();
+            }
+        }
+
+    }
 }

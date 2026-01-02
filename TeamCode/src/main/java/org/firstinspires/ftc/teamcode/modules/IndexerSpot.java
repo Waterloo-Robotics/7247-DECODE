@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.modules;
 
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,6 +18,10 @@ public class IndexerSpot {
 
     public ArtifactStatus artifact_status = ArtifactStatus.EMPTY;
 
+    private final double home_position;
+    private final double shoot_position;
+    private final double middle_position;
+
     private enum ModuleStates {
         HOME,
         SHOOTING,
@@ -27,18 +33,28 @@ public class IndexerSpot {
 
     public IndexerSpot(Servo spot_servo,
                        RevColorSensorV3 spot_color_a,
-                       RevColorSensorV3 spot_color_b)
+                       RevColorSensorV3 spot_color_b,
+                       double home,
+                       double shoot,
+                       double middle)
     {
         this.servo = spot_servo;
         this.color_a = spot_color_a;
         this.color_b = spot_color_b;
+        this.home_position = home;
+        this.shoot_position = shoot;
+        this.middle_position = middle;
+
+        this.servo.setPosition(this.home_position);
     }
 
     public void updateArtifactStatus()
     {
-        int red   = (this.color_a.red()   + this.color_b.red())   / 2;
-        int green = (this.color_a.green() + this.color_b.green()) / 2;
-        int blue  = (this.color_a.blue()  + this.color_b.blue())  / 2;
+        NormalizedRGBA results_a = this.color_a.getNormalizedColors();
+        NormalizedRGBA results_b = this.color_a.getNormalizedColors();
+        int red   = (int)(results_a.red   + results_b.red) * 255 / 2;
+        int green = (int)(results_a.green + results_b.green) * 255 / 2;
+        int blue  = (int)(results_a.blue  + results_b.blue) * 255 / 2;
 
         // Use distance to detect if a ball is present
         double avgDistance = (this.color_a.getDistance(DistanceUnit.CM) +
@@ -52,15 +68,22 @@ public class IndexerSpot {
         } else if (red + blue > green + 80) {
             this.artifact_status = ArtifactStatus.PURPLE;
         } else {
-            this.artifact_status = ArtifactStatus.UNKNOWN;
+            this.artifact_status = ArtifactStatus.GREEN;
         }
     }
 
     public void shoot()
     {
-        this.servo.setPosition(1);
+        this.servo.setPosition(this.shoot_position);
         this.servo_timer.reset();
-        this.servo_timer.startTime();
+
+        this.module_state = ModuleStates.SHOOTING;
+    }
+
+    public void blockMiddle()
+    {
+        this.servo.setPosition(this.middle_position);
+        this.servo_timer.reset();
 
         this.module_state = ModuleStates.SHOOTING;
     }
@@ -78,12 +101,11 @@ public class IndexerSpot {
             case SHOOTING:
                 /* If enough time has elapsed for the artifact to put into the
                 /* turret, then reset the timer and lower the arm */
-                if (this.servo_timer.time() > 1)
+                if (this.servo_timer.seconds() > 0.7)
                 {
                     this.servo_timer.reset();
-                    this.servo_timer.startTime();
 
-                    this.servo.setPosition(0);
+                    this.servo.setPosition(this.home_position);
                     this.module_state = ModuleStates.RETURNING_HOME;
                 }
                 break;
@@ -91,7 +113,7 @@ public class IndexerSpot {
             case RETURNING_HOME:
                 /* If enough time has elapsed for the arm to return home,
                 /* stop the timer and return status to home */
-                if (this.servo_timer.time() > 0.5)
+                if (this.servo_timer.seconds() > 0.2)
                 {
                     this.servo_timer.reset();
 
