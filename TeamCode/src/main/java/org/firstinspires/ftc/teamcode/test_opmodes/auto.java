@@ -19,7 +19,7 @@ public class auto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     // we use a varible so we can change the power easily later on
-    static final double FORWARD_POWER = 1;
+    static final double FORWARD_POWER = 0.5;
     static final long DRIVE_TIME_MS = 2800;
 
 
@@ -50,7 +50,7 @@ public class auto extends LinearOpMode {
             frontRight.setPower(FORWARD_POWER);
             backLeft.setPower(FORWARD_POWER);
             backRight.setPower(FORWARD_POWER);
-            sleep(500);
+            sleep(1000);
         }
 
     }}

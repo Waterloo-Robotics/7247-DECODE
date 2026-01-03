@@ -57,9 +57,9 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private double flywheelRPM;
     private double turretRotaTION;
     FCDrivebaseModule drivebase;
-    float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3120, 3300, 3900,3900};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.6, (float)0.55};
+    private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
+    private float[] flywheel_speed = {2700, 3000, 3000, 3000, 3300, 3200, 3300, 3500, 3350, 4000,4000};
+    private float[] hood_angle = { (float)0.67, (float)0.4, (float)0.4, (float)0.4, (float)0.2,(float)0.0,(float)0.0,(float)0.0,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
@@ -106,6 +106,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelRPM = 0;
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
+        limelight.start();
 
         ((LynxI2cDeviceSynch) color1a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color1b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
@@ -130,10 +131,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
         float angle = 1;
         boolean limelight_available = false;
 
-//        Pose2D pose = llModule.limelightResult();
-        Pose2D pose = null;
-
+        Pose2D pose = llModule.limelightResult();
         float limelight_distance = 0;
+       // Pose2D pose = null; not sure why we had this but ill just comment it out
+
         if (pose != null) {
             limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
 
@@ -184,6 +185,15 @@ public class H2OLooBots_Final_Bot extends OpMode {
             backintakePower = 0;
         }
 
+        if (gamepad1.right_bumper) {
+            frontintakePower = -1;
+            backintakePower = -1;
+        }
+        else {
+            frontintakePower = 0;
+            backintakePower = 0;
+        }
+
         // --- Indexer controls ---
         indexerModule.update();
         if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelRPM >= 3000)
@@ -217,14 +227,14 @@ public class H2OLooBots_Final_Bot extends OpMode {
 //        }
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-//        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
-//            AutoTargeting = !AutoTargeting;
-//        }
-//
-//        if(AutoTargeting) {
-//            flywheelRPM = rpm;
-//            hoodPosition = angle;
-//        }
+        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+            AutoTargeting = !AutoTargeting;
+        }
+
+        if(AutoTargeting) {
+            flywheelRPM = rpm;
+            hoodPosition = angle;
+        }
 
 //        if (gamepad2.dpad_left|| gamepad1.dpad_left) {
 //            hoodPosition = 0.725;
