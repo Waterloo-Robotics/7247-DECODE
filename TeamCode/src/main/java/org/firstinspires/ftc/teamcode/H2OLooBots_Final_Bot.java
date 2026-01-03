@@ -102,6 +102,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelRPM = 0;
 
         llModule = new LimelightProcessingModule(limelight, telemetry);
+        limelight.start();
 
         ((LynxI2cDeviceSynch) color1a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color1b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
@@ -120,13 +121,14 @@ public class H2OLooBots_Final_Bot extends OpMode {
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
+        limelight.getLatestResult();
 
         float rpm = 0;
         float angle = 1;
         boolean limelight_available = false;
 
-//        Pose2D pose = llModule.limelightResult();
-        Pose2D pose = null;
+        Pose2D pose = llModule.limelightResult();
+       //  Pose2D pose = null;
 
         float limelight_distance = 0;
         if (pose != null) {
