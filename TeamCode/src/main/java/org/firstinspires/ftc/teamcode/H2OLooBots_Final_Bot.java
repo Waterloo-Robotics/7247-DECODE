@@ -50,10 +50,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
     private IndexerModule indexerModule;
+   // private Servo full_light;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
     private double flywheelRPM;
+    private double turretRotaTION;
     FCDrivebaseModule drivebase;
     float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
     private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3120, 3300, 3900,3900};
@@ -87,8 +89,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+       //  full_light = hardwareMap.get(Servo.class, "full_light");
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
+
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -117,9 +121,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
-        if(hoodPosition <= .4){
-            hoodPosition = .4;
-        }
+
+//        if(hoodPosition <= .4){
+//            hoodPosition = .4;
+//        }
 
         float rpm = 0;
         float angle = 1;
@@ -167,6 +172,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         // --- Touchpad reverses both while held ---
         if (gamepad2.touchpad || gamepad1.touchpad) {
             flywheelRPM = 3500;
+            hoodPosition = 0;
         }
 
         if (gamepad1.left_bumper) {
@@ -180,22 +186,21 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
         // --- Indexer controls ---
         indexerModule.update();
-        if (gamepad2.bWasPressed())
+        if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelRPM >= 3000)
         {
             indexerModule.shootGreen();
-        } else if (gamepad2.xWasPressed())
+        } else if (gamepad2.xWasPressed()||gamepad1.xWasPressed() && flywheelRPM >= 3000)
         {
             indexerModule.shootPurple();
-        } else if (gamepad2.yWasPressed())
+        } else if (gamepad2.yWasPressed()||gamepad1.yWasPressed() && flywheelRPM >=3000)
         {
             indexerModule.shootAll();
         }
 
         // --- Flywheel Stop (A) ---
-//        if (gamepad2.a || gamepad1.a) {
-//            flywheelRPM = 0;
-//            hoodPosition =1;
-//        }
+        if (gamepad2.a || gamepad1.a) {
+            flywheelRPM = 0;
+        }
 
         // Apply powers
         frontIntake.setPower(frontintakePower);
@@ -212,24 +217,24 @@ public class H2OLooBots_Final_Bot extends OpMode {
 //        }
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
-            AutoTargeting = !AutoTargeting;
-        }
+//        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+//            AutoTargeting = !AutoTargeting;
+//        }
+//
+//        if(AutoTargeting) {
+//            flywheelRPM = rpm;
+//            hoodPosition = angle;
+//        }
 
-        if(AutoTargeting) {
-            flywheelRPM = rpm;
-            hoodPosition = angle;
-        }
-
-        if (gamepad2.dpad_left) {
-            hoodPosition = 0.725;
-            flywheelRPM = 3500;
-        }
-
-        if (gamepad2.dpad_right) {
-            hoodPosition = 0.575;
-            flywheelRPM = 3750;
-        }
+//        if (gamepad2.dpad_left|| gamepad1.dpad_left) {
+//            hoodPosition = 0.725;
+//            flywheelRPM = 3500;
+//        }
+//
+//        if (gamepad2.dpad_right||gamepad1.dpad_right) {
+//            hoodPosition = 0.575;
+//            flywheelRPM = 3750;
+//        }
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
