@@ -64,10 +64,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
     GoBildaPinpointDriver pinpoint;
-    private double GREENLED = 0.500;
-    private double REDLED = 0.277;
-    private double YELLOWLED = 0.388;
-    private double LEDOFF = 0.0;
 
     @Override
     public void init() {
@@ -207,19 +203,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         } else if (gamepad2.yWasPressed())
         {
             indexerModule.shootAll();
-        }
-
-        if (indexerModule.num_artifacts == 0) {
-            light1.setPosition(LEDOFF);
-        }
-        else if (indexerModule.num_artifacts == 1) {
-            light1.setPosition(GREENLED);
-        }
-        else if (indexerModule.num_artifacts == 2) {
-            light1.setPosition(YELLOWLED);
-        }
-        else if (indexerModule.num_artifacts == 3) {
-            light1.setPosition(REDLED);
         }
 
         // --- Flywheel Stop (A) ---

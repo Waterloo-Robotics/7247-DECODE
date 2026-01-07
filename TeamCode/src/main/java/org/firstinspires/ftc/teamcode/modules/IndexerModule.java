@@ -12,8 +12,13 @@ public class IndexerModule {
     public IndexerSpot artifact_2;
     public IndexerSpot artifact_3;
 
+    private double GREENLED = 0.500;
+    private double REDLED = 0.277;
+    private double YELLOWLED = 0.388;
+    private double LEDOFF = 0.0;
     public List<IndexerSpot> artifacts = new ArrayList<>();
     public int num_artifacts = 0;
+    public Servo light1;
 
     public enum ModuleStates {
         WAITING,
@@ -45,6 +50,18 @@ public class IndexerModule {
         this.artifact_2.update();
         this.artifact_3.update();
 
+        if (num_artifacts == 0) {
+            light1.setPosition(LEDOFF);
+        }
+        else if (num_artifacts == 1) {
+            light1.setPosition(GREENLED);
+        }
+        else if (num_artifacts == 2) {
+            light1.setPosition(YELLOWLED);
+        }
+        else if (num_artifacts == 3) {
+            light1.setPosition(REDLED);
+        }
         /* Recount the number of artifacts currently in the indexer */
         this.num_artifacts = 0;
         for (IndexerSpot spot : this.artifacts)
