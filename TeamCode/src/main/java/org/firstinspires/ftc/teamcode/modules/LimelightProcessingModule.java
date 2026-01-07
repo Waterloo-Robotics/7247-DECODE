@@ -21,8 +21,8 @@ public Limelight3A limelight;
     {
         this.telemetry = telemetry;
         this.limelight = limelight;
-//        this.limelight.pipelineSwitch(0);
-//        this.limelight.start();
+        this.limelight.pipelineSwitch(0);
+        this.limelight.start();
     }
     /* ------ */
     /* limelightResult

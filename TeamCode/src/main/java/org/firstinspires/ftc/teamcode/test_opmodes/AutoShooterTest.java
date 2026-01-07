@@ -27,14 +27,12 @@ public class AutoShooterTest extends OpMode {
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor flywheel;
-    private DcMotor intake;
-    private DcMotor transfer;
     private double flywheelRPM;
     private double hoodPosition;
 
     private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2650, 2900, 3000, 3100, 3150, 3270, 3300, 3250, 3350, 4000,4000};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.75, (float)0.75,(float)0.75,(float)0.75,(float)0.75,(float)0.65,(float)0.55, (float)0.50};
+    private float[] flywheel_speed = {2700, 3000, 3000, 3000, 3300, 3200, 3300, 3500, 3350, 4000,4000};
+    private float[] hood_angle = { (float)0.67, (float)0.4, (float)0.4, (float)0.4, (float)0.2,(float)0.0,(float)0.0,(float)0.0,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
@@ -50,8 +48,6 @@ public class AutoShooterTest extends OpMode {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        transfer = hardwareMap.get(DcMotor.class, "transfer");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         hood = hardwareMap.get(Servo.class, "hood");
 
@@ -140,38 +136,12 @@ public class AutoShooterTest extends OpMode {
         double intakePower = 0.0;
         double transferPower = 0.0;
 
-        // --- Touchpad reverses both while held ---
-        if (gamepad2.touchpad || gamepad1.touchpad) {
-            intakePower = -1.0;      // reverse
-            transferPower = 1.0;    // reverse
-            flywheelRPM = 3500;
-        }
-
-        // --- Ball 1 (B) ---
-        else if (gamepad2.b || gamepad1.b) {
-            intakePower = 1.0;     // forward
-            transferPower = -1.0;   // forward
-        }
-
-        // --- Ball 2 (X) ---
-        else if (gamepad2.x || gamepad1.x) {
-            intakePower = 1.0;      // forward
-        }
-
-        // --- Default: stop both ---
-        else {
-            intakePower = 0.0;
-            transferPower = 0.0;
-        }
-
         // --- Flywheel Stop (A) ---
         if (gamepad2.a) {
             flywheelRPM = 0;
         }
 
         // Apply powers
-        intake.setPower(intakePower);
-        transfer.setPower(transferPower);
         flywheelControl.set_speed((int) flywheelRPM);
 
         telemetry.addData("Intake Power", intakePower);
@@ -184,17 +154,11 @@ public class AutoShooterTest extends OpMode {
             hoodPosition += 0.005;
         }
 
+
+
+
+
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
-
-        if (gamepad2.dpad_left) {
-            hoodPosition = 0.725;
-            flywheelRPM = 3500;
-        }
-
-        if (gamepad2.dpad_right) {
-            hoodPosition = 0.575;
-            flywheelRPM = 3750;
-        }
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);

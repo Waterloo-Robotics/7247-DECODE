@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.test_opmodes;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name="red Auto")
-public class redAuto extends LinearOpMode {
+@Autonomous(name="Leave Auto")
+public class auto extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
     private DcMotor frontLeft;
@@ -19,7 +19,7 @@ public class redAuto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     // we use a varible so we can change the power easily later on
-
+    static final double FORWARD_POWER = 0.5;
     static final long DRIVE_TIME_MS = 2800;
 
 
@@ -46,10 +46,10 @@ public class redAuto extends LinearOpMode {
         if (opModeIsActive()) {
             // SLEEP = Time to run command before moving to the next, in miliseconds
             sleep(750);
-            frontLeft.setPower(0.5);
-            frontRight.setPower(-0.5);
-            backLeft.setPower(-0.5);
-            backRight.setPower(0.5);
+            frontLeft.setPower(FORWARD_POWER);
+            frontRight.setPower(FORWARD_POWER);
+            backLeft.setPower(FORWARD_POWER);
+            backRight.setPower(FORWARD_POWER);
             sleep(1000);
         }
 
