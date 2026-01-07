@@ -245,6 +245,9 @@ public class H2OLooBots_Final_Bot extends OpMode {
             flywheelRPM = 3750;
         }
 
+
+
+
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
 
