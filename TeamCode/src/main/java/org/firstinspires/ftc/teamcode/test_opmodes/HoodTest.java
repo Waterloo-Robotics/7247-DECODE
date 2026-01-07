@@ -59,7 +59,7 @@ public class HoodTest extends OpMode{
     private DcMotor flywheel;
 //    private DcMotor intake;
     private Servo hood;
-    private double hoodPosition = 1;
+    private double hoodPosition = 0.0;
 
     /* start of module stuff */
     flywheelModule flywheelControl;
@@ -164,14 +164,12 @@ public class HoodTest extends OpMode{
 //
 
         // start of hood control stuff
-
-
         // Control servo with gamepad
         if (gamepad1.dpad_up && hoodPosition < 1.0) {
-            hoodPosition += 0.01;
+            hoodPosition += 0.001;
 
         } else if (gamepad1.dpad_down && hoodPosition > 0.0) {
-            hoodPosition -= 0.01;
+            hoodPosition -= 0.001;
         }
         hood.setPosition(hoodPosition);
         // end of hood control stuff
