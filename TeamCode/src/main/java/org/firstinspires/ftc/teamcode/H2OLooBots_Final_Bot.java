@@ -39,6 +39,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Servo ball2;
     private Servo ball3;
     private Servo hood;
+    private Servo light1;
+    private Servo light2;
     private Servo linearServo;
     private RevColorSensorV3 color1a;
     private RevColorSensorV3 color1b;
@@ -87,6 +89,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        light1 = hardwareMap.get(Servo.class, "light1"); // Servo Port 4 on CONTROL hub
+        light2 = hardwareMap.get(Servo.class, "light2"); // Servo Port 3 on CONTROL hub
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
