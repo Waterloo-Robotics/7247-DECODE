@@ -209,16 +209,16 @@ public class H2OLooBots_Final_Bot extends OpMode {
             indexerModule.shootAll();
         }
 
-        if (this.num_artifacts = 0) {
+        if (indexerModule.num_artifacts == 0) {
             light1.setPosition(LEDOFF);
         }
-        else if (this.num_artifacts = 1) {
+        else if (indexerModule.num_artifacts == 1) {
             light1.setPosition(GREENLED);
         }
-        else if (this.num_artifacts = 2) {
+        else if (indexerModule.num_artifacts == 2) {
             light1.setPosition(YELLOWLED);
         }
-        else if (this.num_artifacts = 3) {
+        else if (indexerModule.num_artifacts == 3) {
             light1.setPosition(REDLED);
         }
 
