@@ -64,6 +64,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
     boolean AutoTargeting;
     GoBildaPinpointDriver pinpoint;
+    private double GREENLED = 0.500;
+    private double REDLED = 0.277;
+    private double YELLOWLED = 0.388;
+    private double LEDOFF = 0.0;
 
     @Override
     public void init() {
@@ -91,6 +95,14 @@ public class H2OLooBots_Final_Bot extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         light1 = hardwareMap.get(Servo.class, "light1"); // Servo Port 4 on CONTROL hub
         light2 = hardwareMap.get(Servo.class, "light2"); // Servo Port 3 on CONTROL hub
+        /* LED INFO
+        We should have it be green if there is 1 ball in there, yellow if 2, and 3 if green, that way there is an easy
+        to remember sequence. Here are the servo pos for each color:
+
+        RED == 0.277
+        YELLOW == 0.388
+        GREEN == 0.500
+         */
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
@@ -195,6 +207,19 @@ public class H2OLooBots_Final_Bot extends OpMode {
         } else if (gamepad2.yWasPressed())
         {
             indexerModule.shootAll();
+        }
+
+        if (this.num_artifacts = 0) {
+            light1.setPosition(LEDOFF);
+        }
+        else if (this.num_artifacts = 1) {
+            light1.setPosition(GREENLED);
+        }
+        else if (this.num_artifacts = 2) {
+            light1.setPosition(YELLOWLED);
+        }
+        else if (this.num_artifacts = 3) {
+            light1.setPosition(REDLED);
         }
 
         // --- Flywheel Stop (A) ---
