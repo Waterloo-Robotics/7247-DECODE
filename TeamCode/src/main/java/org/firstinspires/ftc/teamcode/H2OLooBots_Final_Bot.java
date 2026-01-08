@@ -39,8 +39,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Servo ball2;
     private Servo ball3;
     private Servo hood;
-    private Servo light1;
-    private Servo light2;
     private Servo linearServo;
     private RevColorSensorV3 color1a;
     private RevColorSensorV3 color1b;
@@ -52,16 +50,15 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
     private IndexerModule indexerModule;
+   // private Servo full_light;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
     private double flywheelRPM;
+    private double turretRotaTION;
     FCDrivebaseModule drivebase;
-    float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2600, 2750, 2850, 3020, 3070, 3170, 3190, 3120, 3300, 3900,3900};
-    private float[] hood_angle = { (float)0.75, (float)0.75, (float)0.75, (float)0.65, (float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.65,(float)0.6, (float)0.55};
     private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2700, 3000, 3050, 3150, 3300, 3200, 3300, 3500, 3350, 4000,4000};
+    private float[] flywheel_speed = {2700, 3000, 3000, 3000, 3300, 3200, 3300, 3500, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.67, (float)0.4, (float)0.4, (float)0.4, (float)0.2,(float)0.0,(float)0.0,(float)0.0,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
@@ -85,8 +82,6 @@ public class H2OLooBots_Final_Bot extends OpMode {
         ball3 = hardwareMap.get(Servo.class, "ball3"); // ORANGE servo port 0  on CONTROL hub
         linearServo = hardwareMap.get(Servo.class, "linearServo"); // GREEN servo port 1 on EXPANSION hub
         hood = hardwareMap.get(Servo.class, "hood"); // BLUE & servo port 1 on CONTROL hub
-        light1 = hardwareMap.get(Servo.class,"light1");//PURPLE & servo port 3 on CONTROL HUB
-        light2 = hardwareMap.get(Servo.class,"light2");//GREY & servo port 4 on CONTROL HUB
         color1a = hardwareMap.get(RevColorSensorV3.class, "color1a"); // BLUE & 12c Bus 3 on EXPANSION hub
         color1b = hardwareMap.get(RevColorSensorV3.class, "color1b"); // PURPLE & 12c Bus 2 on EXPANSION hub
         color2a = hardwareMap.get(RevColorSensorV3.class, "color2a"); // YELLOW & 12c Bus 3 on CONTROL hub
@@ -94,16 +89,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        light1 = hardwareMap.get(Servo.class, "light1"); // Servo Port 4 on CONTROL hub
-        light2 = hardwareMap.get(Servo.class, "light2"); // Servo Port 3 on CONTROL hub
-        /* LED INFO
-        We should have it be green if there is 1 ball in there, yellow if 2, and 3 if green, that way there is an easy
-        to remember sequence. Here are the servo pos for each color:
-
-        RED == 0.277
-        YELLOW == 0.388
-        GREEN == 0.500
-         */
+       //  full_light = hardwareMap.get(Servo.class, "full_light");
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
 
@@ -136,19 +122,19 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
-        if(hoodPosition <= .4){
-            hoodPosition = .4;
-        }
-        limelight.getLatestResult();
+
+//        if(hoodPosition <= .4){
+//            hoodPosition = .4;
+//        }
 
         float rpm = 0;
         float angle = 1;
         boolean limelight_available = false;
 
         Pose2D pose = llModule.limelightResult();
-       //  Pose2D pose = null;
-
         float limelight_distance = 0;
+       // Pose2D pose = null; not sure why we had this but ill just comment it out
+
         if (pose != null) {
             limelight_distance = (float) (1.75*(float) -pose.getX(DistanceUnit.INCH));
 
@@ -181,12 +167,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
         /* ---------------- BALL / INTAKE / TRANSFER CONTROL ---------------- */
-        double frontintakePower1 = 1;
-        double backintakePower1  = 1;
-        double frontintakePower2 = -1;
-        double backintakePower2 = -1;
-        double frontintakePower0 = 0.0;
-        double backintakePower0 = 0.0;
+        double frontintakePower = 0.0;
+        double backintakePower = 0.0;
 
         // --- Touchpad reverses both while held ---
         if (gamepad2.touchpad || gamepad1.touchpad) {
@@ -195,48 +177,48 @@ public class H2OLooBots_Final_Bot extends OpMode {
         }
 
         if (gamepad1.left_bumper) {
-            frontIntake.setPower(1);
-            backIntake.setPower(1);
-        } else if (gamepad1.right_bumper) {
-            frontIntake.setPower(-1);
-            backIntake.setPower(-1);
+            frontintakePower = 1;
+            backintakePower = 1;
         }
         else {
-            frontIntake.setPower(0);
-            backIntake.setPower(0);
+            frontintakePower = 0;
+            backintakePower = 0;
         }
-//
 
+        if (gamepad1.right_bumper) {
+            frontintakePower = -1;
+            backintakePower = -1;
+        }
+        else {
             frontintakePower = 0;
             backintakePower = 0;
         }
 
         // --- Indexer controls ---
         indexerModule.update();
-        if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
-        if (gamepad2.bWasPressed())
+        if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelRPM >= 3000)
         {
             indexerModule.shootGreen();
-        } else if (gamepad2.xWasPressed()||gamepad1.xWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
-        } else if (gamepad2.xWasPressed())
+        } else if (gamepad2.xWasPressed()||gamepad1.xWasPressed() && flywheelRPM >= 3000)
         {
             indexerModule.shootPurple();
-        } else if (gamepad2.yWasPressed())
-        } else if (gamepad2.yWasPressed()||gamepad1.yWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
+        } else if (gamepad2.yWasPressed()||gamepad1.yWasPressed() && flywheelRPM >=3000)
         {
             indexerModule.shootAll();
         }
 
         // --- Flywheel Stop (A) ---
-//        if (gamepad2.a || gamepad1.a) {
-//            flywheelRPM = 0;
-//            hoodPosition =1;
-//        }
+        if (gamepad2.a || gamepad1.a) {
+            flywheelRPM = 0;
+        }
 
+        // Apply powers
+        frontIntake.setPower(frontintakePower);
+        backIntake.setPower(backintakePower);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        telemetry.addData("front Power", frontintakePower1);
-        telemetry.addData("back Power", backintakePower1);
+        telemetry.addData("front Power", frontintakePower);
+        telemetry.addData("back Power", backintakePower);
 
 //        if (gamepad2.dpad_up) {
 //            hoodPosition -= 0.005;
@@ -254,18 +236,15 @@ public class H2OLooBots_Final_Bot extends OpMode {
             hoodPosition = angle;
         }
 
-        if (gamepad2.dpad_left) {
-            hoodPosition = 0.725;
-            flywheelRPM = 3500;
-        }
-
-        if (gamepad2.dpad_right) {
-            hoodPosition = 0.575;
-            flywheelRPM = 3750;
-        }
-
-
-
+//        if (gamepad2.dpad_left|| gamepad1.dpad_left) {
+//            hoodPosition = 0.725;
+//            flywheelRPM = 3500;
+//        }
+//
+//        if (gamepad2.dpad_right||gamepad1.dpad_right) {
+//            hoodPosition = 0.575;
+//            flywheelRPM = 3750;
+//        }
 
         hood.setPosition(hoodPosition);
         flywheelControl.set_speed((int) flywheelRPM);
