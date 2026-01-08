@@ -9,6 +9,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -17,7 +18,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
 import org.firstinspires.ftc.teamcode.modules.IndexerModule;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
+import org.firstinspires.ftc.teamcode.modules.ShooterModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
+import org.firstinspires.ftc.teamcode.modules.TurretModule;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
 import java.util.ArrayList;
@@ -52,6 +55,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
     private IndexerModule indexerModule;
+    private ShooterModule shooterModule;
+    private TurretModule turretModule;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
@@ -116,13 +121,16 @@ public class H2OLooBots_Final_Bot extends OpMode {
         llModule = new LimelightProcessingModule(limelight, telemetry);
         limelight.start();
 
+        turretModule = new TurretModule(linearServo, turretRotation);
+        shooterModule = new ShooterModule(hood, flywheel);
+
         ((LynxI2cDeviceSynch) color1a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color1b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color2a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color2b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color3a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color3b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
-        indexerModule = new IndexerModule(ball1, color1a, color1b, ball2, color2a, color2b, ball3, color3a, color3b);
+        indexerModule = new IndexerModule(ball1, color1a, color1b, ball2, color2a, color2b, ball3, color3a, color3b, light1);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -130,6 +138,20 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
+        if (gamepad1.aWasPressed())
+        {
+            turretModule.home_turret();
+        } else if (gamepad1.bWasPressed())
+        {
+            turretModule.go_backwards();
+        } else if (gamepad1.yWasPressed())
+        {
+            turretModule.go_forwards();
+        }
+
+        turretModule.update();
+        telemetry.addData("Turret Position", turretRotation.getCurrentPosition());
+
         if(hoodPosition <= .4){
             hoodPosition = .4;
         }
