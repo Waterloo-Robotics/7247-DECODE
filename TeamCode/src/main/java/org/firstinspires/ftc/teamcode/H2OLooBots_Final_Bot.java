@@ -39,6 +39,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Servo ball2;
     private Servo ball3;
     private Servo hood;
+    private Servo light1;
+
+    private Servo light2;
+
     private Servo linearServo;
     private RevColorSensorV3 color1a;
     private RevColorSensorV3 color1b;
@@ -58,7 +62,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private double turretRotaTION;
     FCDrivebaseModule drivebase;
     private float[] distance = {22, 30, 35, 40,44,52,56,69,81,125,126};
-    private float[] flywheel_speed = {2700, 3000, 3000, 3000, 3300, 3200, 3300, 3500, 3350, 4000,4000};
+    private float[] flywheel_speed = {2700, 3000, 3050, 3150, 3300, 3200, 3300, 3500, 3350, 4000,4000};
     private float[] hood_angle = { (float)0.67, (float)0.4, (float)0.4, (float)0.4, (float)0.2,(float)0.0,(float)0.0,(float)0.0,(float)0.65,(float)0.55, (float)0.50};
     private Table2D flywheel_speed_table = new Table2D(distance, flywheel_speed);
     private Table2D hood_angle_table = new Table2D(distance, hood_angle);
@@ -82,6 +86,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
         ball3 = hardwareMap.get(Servo.class, "ball3"); // ORANGE servo port 0  on CONTROL hub
         linearServo = hardwareMap.get(Servo.class, "linearServo"); // GREEN servo port 1 on EXPANSION hub
         hood = hardwareMap.get(Servo.class, "hood"); // BLUE & servo port 1 on CONTROL hub
+        light1 = hardwareMap.get(Servo.class,"light1");//PURPLE & servo port 3 on CONTROL HUB
+        light2 = hardwareMap.get(Servo.class,"light2");//GREY & servo port 4 on CONTROL HUB
         color1a = hardwareMap.get(RevColorSensorV3.class, "color1a"); // BLUE & 12c Bus 3 on EXPANSION hub
         color1b = hardwareMap.get(RevColorSensorV3.class, "color1b"); // PURPLE & 12c Bus 2 on EXPANSION hub
         color2a = hardwareMap.get(RevColorSensorV3.class, "color2a"); // YELLOW & 12c Bus 3 on CONTROL hub
@@ -167,8 +173,12 @@ public class H2OLooBots_Final_Bot extends OpMode {
         flywheelControl.set_speed((int) flywheelRPM);
 
         /* ---------------- BALL / INTAKE / TRANSFER CONTROL ---------------- */
-        double frontintakePower = 0.0;
-        double backintakePower = 0.0;
+        double frontintakePower1 = 1;
+        double backintakePower1  = 1;
+        double frontintakePower2 = -1;
+        double backintakePower2 = -1;
+        double frontintakePower0 = 0.0;
+        double backintakePower0 = 0.0;
 
         // --- Touchpad reverses both while held ---
         if (gamepad2.touchpad || gamepad1.touchpad) {
@@ -177,32 +187,27 @@ public class H2OLooBots_Final_Bot extends OpMode {
         }
 
         if (gamepad1.left_bumper) {
-            frontintakePower = 1;
-            backintakePower = 1;
+            frontIntake.setPower(1);
+            backIntake.setPower(1);
+        } else if (gamepad1.right_bumper) {
+            frontIntake.setPower(-1);
+            backIntake.setPower(-1);
         }
         else {
-            frontintakePower = 0;
-            backintakePower = 0;
+            frontIntake.setPower(0);
+            backIntake.setPower(0);
         }
-
-        if (gamepad1.right_bumper) {
-            frontintakePower = -1;
-            backintakePower = -1;
-        }
-        else {
-            frontintakePower = 0;
-            backintakePower = 0;
-        }
+//
 
         // --- Indexer controls ---
         indexerModule.update();
-        if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelRPM >= 3000)
+        if (gamepad2.bWasPressed() || gamepad1.bWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
         {
             indexerModule.shootGreen();
-        } else if (gamepad2.xWasPressed()||gamepad1.xWasPressed() && flywheelRPM >= 3000)
+        } else if (gamepad2.xWasPressed()||gamepad1.xWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
         {
             indexerModule.shootPurple();
-        } else if (gamepad2.yWasPressed()||gamepad1.yWasPressed() && flywheelRPM >=3000)
+        } else if (gamepad2.yWasPressed()||gamepad1.yWasPressed() && flywheelControl.motor_speed_rpm >= 3000)
         {
             indexerModule.shootAll();
         }
@@ -212,13 +217,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
             flywheelRPM = 0;
         }
 
-        // Apply powers
-        frontIntake.setPower(frontintakePower);
-        backIntake.setPower(backintakePower);
         flywheelControl.set_speed((int) flywheelRPM);
 
-        telemetry.addData("front Power", frontintakePower);
-        telemetry.addData("back Power", backintakePower);
+        telemetry.addData("front Power", frontintakePower1);
+        telemetry.addData("back Power", backintakePower1);
 
 //        if (gamepad2.dpad_up) {
 //            hoodPosition -= 0.005;
