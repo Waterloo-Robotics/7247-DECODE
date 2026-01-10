@@ -8,12 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.modules.AngleModule;
 import org.firstinspires.ftc.teamcode.modules.DesiredAngleModule;
 import org.firstinspires.ftc.teamcode.modules.FieldPositionEstimation;
 
 @TeleOp(name=" Desired Angle Test", group="TestOpMode")
-public class DesiredAngleTest extends OpMode {
+public class DesiredAngleTestR extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
     private DcMotor frontLeft;
@@ -30,9 +29,9 @@ public class DesiredAngleTest extends OpMode {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        field_estimator = new FieldPositionEstimation(pinpoint, false);
+        field_estimator = new FieldPositionEstimation(pinpoint, true);
 
-        desiredangleM = new DesiredAngleModule(false);
+        desiredangleM = new DesiredAngleModule(true);
 
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
