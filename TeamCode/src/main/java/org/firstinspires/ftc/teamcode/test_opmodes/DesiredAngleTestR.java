@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.modules.DesiredAngleModule;
 import org.firstinspires.ftc.teamcode.modules.FieldPositionEstimation;
 
@@ -58,7 +59,7 @@ public class DesiredAngleTestR extends OpMode {
 
         if(gamepad1.a){
             field_estimator.reset_pinpoint();
-            desired_angle = 0;
+
         }
         field_estimator.update_from_pinpoint();
 
@@ -100,7 +101,8 @@ public class DesiredAngleTestR extends OpMode {
         backRight.setPower(backRightPower);
 
         telemetry.addData("Desired Angle", desired_angle);
-
+        telemetry.addData("X", "%f.2" , field_estimator.relative_robot_position.getX(DistanceUnit.INCH));
+        telemetry.addData("Y", "%f.2", field_estimator.relative_robot_position.getY(DistanceUnit.INCH));
         telemetry.addData("Rotation", "%f.2", field_estimator.relative_robot_position.getHeading(AngleUnit.DEGREES));
         telemetry.update();
     }}
