@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.modules.DesiredAngleModule;
 import org.firstinspires.ftc.teamcode.modules.FieldPositionEstimation;
 
-@TeleOp(name=" Desired Angle Test", group="TestOpMode")
+@TeleOp(name=" Desired Angle TestB", group="TestOpMode")
 public class DesiredAngleTestB extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;

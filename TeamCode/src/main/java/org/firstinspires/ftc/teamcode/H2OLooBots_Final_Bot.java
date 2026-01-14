@@ -91,7 +91,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         color3a = hardwareMap.get(RevColorSensorV3.class, "color3a"); // ORANGE & 12c Bus 1 on CONTROL hub
         color3b = hardwareMap.get(RevColorSensorV3.class, "color3b"); // RED & 12c Bus 0 on CONTROL hub
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-       //  full_light = hardwareMap.get(Servo.class, "full_light");
+         light1 = hardwareMap.get(Servo.class, "light1");
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
         turretModule = new TurretModule(linearServo, turretRotation);
@@ -197,12 +197,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
             frontintakePower = 1;
             backintakePower = 1;
         }
-        else {
-            frontintakePower = 0;
-            backintakePower = 0;
-        }
-
-        if (gamepad1.right_bumper) {
+        else if(gamepad1.right_bumper){
             frontintakePower = -1;
             backintakePower = -1;
         }
