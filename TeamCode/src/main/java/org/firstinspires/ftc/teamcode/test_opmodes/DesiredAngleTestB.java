@@ -18,13 +18,16 @@ public class DesiredAngleTestB extends OpMode {
     private DcMotor backRight;
     private DcMotor frontLeft;
     private DcMotor frontRight;
+    private DcMotor TurretR;
     private FieldPositionEstimation field_estimator;
     private GoBildaPinpointDriver pinpoint;
     private DesiredAngleModule desiredangleM;
     private double desired_angle;
+    boolean TurretOn;
 
     @Override
     public void init() {
+       TurretR = hardwareMap.get(DcMotor.class, "turretRotation");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
@@ -53,9 +56,15 @@ public class DesiredAngleTestB extends OpMode {
 
     @Override
     public void loop() {
+        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+            TurretOn = !TurretOn;
+        }
 
+if(TurretOn){
+    TurretR.setTargetPosition((int) (desired_angle * 4.32222222222));
+    TurretR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
+}
 
         if(gamepad1.a){
             field_estimator.reset_pinpoint();
@@ -100,10 +109,13 @@ public class DesiredAngleTestB extends OpMode {
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+
+        telemetry.addData("Turret", TurretOn);
         telemetry.addData("Desired Angle", desired_angle);
         telemetry.addData("X", "%f.2" , field_estimator.relative_robot_position.getX(DistanceUnit.INCH));
         telemetry.addData("Y", "%f.2", field_estimator.relative_robot_position.getY(DistanceUnit.INCH));
         telemetry.addData("Rotation", "%f.2", field_estimator.relative_robot_position.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("turret pos", TurretR.getCurrentPosition());
         telemetry.update();
     }}
 
