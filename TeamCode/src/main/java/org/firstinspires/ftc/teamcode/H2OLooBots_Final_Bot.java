@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.modules.FCDrivebaseModule;
 import org.firstinspires.ftc.teamcode.modules.IndexerModule;
 import org.firstinspires.ftc.teamcode.modules.LimelightProcessingModule;
 import org.firstinspires.ftc.teamcode.modules.Table2D;
+import org.firstinspires.ftc.teamcode.modules.TurretModule;
 import org.firstinspires.ftc.teamcode.modules.flywheelModule;
 
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private LimelightProcessingModule llModule;
     private IndexerModule indexerModule;
     private Servo light1;
+    private TurretModule turretModule;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
@@ -92,7 +94,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
        //  full_light = hardwareMap.get(Servo.class, "full_light");
 
         drivebase = new FCDrivebaseModule(backLeft, backRight, frontLeft, frontRight, pinpoint);
-
+        turretModule = new TurretModule(linearServo, turretRotation);
 
         // Mecanum motor directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -122,7 +124,22 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
-
+        if (gamepad2.bWasPressed())
+        {
+            turretModule.home_turret();
+        } else if (gamepad2.dpadDownWasPressed())
+        {
+            turretModule.go_backwards();
+        } else if (gamepad2.dpadUpWasPressed())
+        {
+            turretModule.go_forwards();
+        }else if(gamepad2.dpadLeftWasPressed())
+        {
+            turretModule.go_left();
+        }else if(gamepad2.dpadRightWasPressed())
+        {
+            turretModule.go_right();
+        }
 //        if(hoodPosition <= .4){
 //            hoodPosition = .4;
 //        }
@@ -227,7 +244,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
 //        }
         hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
 
-        if(gamepad2.dpadDownWasPressed() || gamepad1.dpadDownWasPressed()){
+        if(gamepad1.dpadDownWasPressed()){
             AutoTargeting = !AutoTargeting;
         }
 

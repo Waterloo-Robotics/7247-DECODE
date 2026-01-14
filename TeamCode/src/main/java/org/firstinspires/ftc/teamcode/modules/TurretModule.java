@@ -71,6 +71,16 @@ public class TurretModule {
         this.current_state = ModuleStates.FORWARD;
     }
 
+    public void go_right()
+    {
+        this.current_state = ModuleStates.RIGHT;
+    }
+
+    public void go_left()
+    {
+        this.current_state = ModuleStates.LEFT;
+    }
+
     public void update()
     {
         switch (this.current_state)
