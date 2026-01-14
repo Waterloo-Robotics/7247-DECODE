@@ -140,6 +140,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         {
             turretModule.go_right();
         }
+        turretModule.update();
 //        if(hoodPosition <= .4){
 //            hoodPosition = .4;
 //        }
