@@ -21,6 +21,8 @@ public class TurretModule {
 
     private static final double BACKWARD_POSITION = -100;
     private static final double FORWARD_POSITION = 650;
+    private static final double LEFT_POSITION = -100;
+    private static final double RIGHT_POSITION = 650;
 
     public double target_position = 0;
     public PIDController turret_controller = new PIDController((float)0.001, 0 , (float)0.002);
@@ -34,6 +36,8 @@ public class TurretModule {
         HOME,
         FORWARD,
         BACKWARD,
+        LEFT,
+        RIGHT,
         ACTIVE;
     }
 
@@ -132,6 +136,22 @@ public class TurretModule {
                 if (this.home_found)
                 {
                     this.target_position = FORWARD_POSITION;
+                    drive_to_target();
+                }
+                break;
+
+            case LEFT:
+                if (this.home_found)
+                {
+                    this.target_position = LEFT_POSITION;
+                    drive_to_target();
+                }
+                break;
+
+            case RIGHT:
+                if (this.home_found)
+                {
+                    this.target_position = RIGHT_POSITION;
                     drive_to_target();
                 }
                 break;
