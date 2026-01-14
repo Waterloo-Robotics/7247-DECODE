@@ -13,7 +13,7 @@ public class IndexerModule {
     public IndexerSpot artifact_3;
 
     private double GREENLED = 0.500;
-    private double REDLED = 0.277;
+    private double REDLED = 0.29;
     private double YELLOWLED = 0.388;
     private double LEDOFF = 0.0;
     public List<IndexerSpot> artifacts = new ArrayList<>();
