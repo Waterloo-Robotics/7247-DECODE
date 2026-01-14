@@ -20,9 +20,9 @@ public class TurretModule {
     public boolean home_found = false;
 
     private static final double BACKWARD_POSITION = -100;
-    private static final double FORWARD_POSITION = 650;
-    private static final double LEFT_POSITION = -100;
-    private static final double RIGHT_POSITION = 650;
+    private static final double FORWARD_POSITION = 693;
+    private static final double LEFT_POSITION = 302;
+    private static final double RIGHT_POSITION = 1090;
 
     public double target_position = 0;
     public PIDController turret_controller = new PIDController((float)0.001, 0 , (float)0.002);

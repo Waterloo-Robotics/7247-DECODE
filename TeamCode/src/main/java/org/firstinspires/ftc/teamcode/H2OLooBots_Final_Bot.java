@@ -292,6 +292,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
+        telemetry.addData("Turret Pos", turretRotation.getCurrentPosition());
         telemetry.update();
     }
 }
