@@ -50,7 +50,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
     private Limelight3A limelight;
     private LimelightProcessingModule llModule;
     private IndexerModule indexerModule;
-   // private Servo full_light;
+    private Servo light1;
 
     /* ---------- Variables ---------- */
     private double hoodPosition = 1; // start with hood down
@@ -114,7 +114,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         ((LynxI2cDeviceSynch) color2b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color3a.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         ((LynxI2cDeviceSynch) color3b.getDeviceClient()).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
-        indexerModule = new IndexerModule(ball1, color1a, color1b, ball2, color2a, color2b, ball3, color3a, color3b);
+        indexerModule = new IndexerModule(ball1, color1a, color1b, ball2, color2a, color2b, ball3, color3a, color3b, light1);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -268,6 +268,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
         telemetry.addData("PID Power", flywheelControl.pid_power);
         telemetry.addData("Hood Pos", hood.getPosition());
         telemetry.addData("AutoTargeting",AutoTargeting);
+        telemetry.addData("Artifacts Deletected", indexerModule.num_artifacts);
         telemetry.update();
     }
 }

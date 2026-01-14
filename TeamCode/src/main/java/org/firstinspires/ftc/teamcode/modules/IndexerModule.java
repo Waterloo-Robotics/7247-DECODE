@@ -33,7 +33,8 @@ public class IndexerModule {
 
     public IndexerModule(Servo a1_servo, RevColorSensorV3 a1_color_a, RevColorSensorV3 a1_color_b,
                          Servo a2_servo, RevColorSensorV3 a2_color_a, RevColorSensorV3 a2_color_b,
-                         Servo a3_servo, RevColorSensorV3 a3_color_a, RevColorSensorV3 a3_color_b)
+                         Servo a3_servo, RevColorSensorV3 a3_color_a, RevColorSensorV3 a3_color_b,
+                         Servo light1)
     {
         this.artifact_1 = new IndexerSpot(a1_servo, a1_color_a, a1_color_b, 1, 0, 0.76);
         this.artifact_2 = new IndexerSpot(a2_servo, a2_color_a, a2_color_b, 1, 0, 0.73);
