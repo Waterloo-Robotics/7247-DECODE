@@ -160,6 +160,8 @@ public class H2OLooBots_Final_Bot extends OpMode {
                 limelight_available = true;
             }
 
+
+
             if(limelight_available){
                 rpm =  (flywheel_speed_table.Lookup(limelight_distance));
                 angle = hood_angle_table.Lookup(limelight_distance);
@@ -167,6 +169,10 @@ public class H2OLooBots_Final_Bot extends OpMode {
             else if (hood_angle_table.Lookup(limelight_distance) <= .45) {
                 angle = .45F;
             }
+            else{
+                rpm = 2500;
+            }
+
         }
 
         /* ---------------- DRIVE CODE ---------------- */
