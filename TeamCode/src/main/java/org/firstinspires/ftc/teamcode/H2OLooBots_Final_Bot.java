@@ -124,7 +124,7 @@ public class H2OLooBots_Final_Bot extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad2.bWasPressed())
+        if (gamepad2.  aWasPressed())
         {
             turretModule.home_turret();
         } else if (gamepad2.dpadDownWasPressed())
