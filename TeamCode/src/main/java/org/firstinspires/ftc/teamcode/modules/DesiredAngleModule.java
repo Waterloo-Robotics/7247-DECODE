@@ -38,7 +38,7 @@ public class DesiredAngleModule {
             double y = robot_position.getY(DistanceUnit.INCH) + 55.6425;
             DesiredAngle = Math.atan2(x,y);
         }
-        return Math.toDegrees(DesiredAngle);
+        return Math.toDegrees(DesiredAngle * 4.32222222222);
     }
 
 
